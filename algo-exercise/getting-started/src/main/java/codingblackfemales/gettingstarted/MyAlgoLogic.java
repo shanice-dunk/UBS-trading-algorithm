@@ -18,6 +18,10 @@ public class MyAlgoLogic implements AlgoLogic {
     // Logs messages during execution of the algo
     private static final Logger logger = LoggerFactory.getLogger(MyAlgoLogic.class);
 
+    // Price thresholds defined 
+    private static final long cheapPriceThreshold = 1000;
+    private static final long expensivePriceThreshold = 1500;
+
     @Override
     // evaluate - decision making
     // Action - create or cancel orders
@@ -57,29 +61,39 @@ public class MyAlgoLogic implements AlgoLogic {
                 return NoAction.NoAction;
             }
         } else {
+            // Bid and Ask levels
+            AskLevel bestAsk = state.getAskAt(0);
+            BidLevel bestBid = state.getBidAt(0);
+
+            // Create a buy order when price is cheap 
+            if (bestAsk != null && bestAsk.price <= cheapPriceThreshold) {
+                long quantity = 100;
+                long price = bestAsk.price;
+                logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
+                return new CreateChildOrder(Side.BUY, quantity, price);
+            }
+
+            // Create sell order when price is high
+            if (bestBid != null && bestBid.price >= expensivePriceThreshold) {
+                long quantity = 100;
+                long price = bestBid.price;
+                logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
+                return new CreateChildOrder(Side.BUY, quantity, price);
+            }
+
+            // No action if no conditions met
+                logger.info("[MYALGOADDCANCEL] No action taken.");
+                return NoAction.NoAction;
+
             // If there are no active orders, create new order
             // Fetches best bid (highest price buyer is willing to pay)
-            BidLevel level = state.getBidAt(0);
+            // BidLevel level = state.getBidAt(0);
             // Extracts price and quantity from bid level
-            final long price = level.price;
-            final long quantity = level.quantity;
+            // final long price = level.price;
+            // final long quantity = level.quantity;
             // Logs details of the order and returns CreateChildOrder action to buy specified quantity at specified price
-            logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
-            return new CreateChildOrder(Side.BUY, quantity, price);
+            // logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
+            // return new CreateChildOrder(Side.BUY, quantity, price);
         }
-
-        // Bid and Ask levels
-        // BidLevel bestBid = state.getBidAt(0);
-        // AskLevel bestAsk = state.getAskAt(0);
-
-        // Buy low logic 
-        // ********* 
-
-        // Sell high logic
-        // ********** 
-
-        // No action if no conditions met
-        // logger.info("[MYALGOADDCANCEL] No action taken.")
-        // return NoAction.NoAction;
     }
 }
