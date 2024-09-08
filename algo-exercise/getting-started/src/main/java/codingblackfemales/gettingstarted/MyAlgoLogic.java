@@ -22,6 +22,7 @@ public class MyAlgoLogic implements AlgoLogic {
     private static final long cheapPriceThreshold = 1000;
     private static final long expensivePriceThreshold = 1500;
 
+
     @Override
     // evaluate - decision making
     // Action - create or cancel orders
@@ -39,8 +40,7 @@ public class MyAlgoLogic implements AlgoLogic {
 
         // Checks total number of child orders that have been created
         // If the number is greater than 20, no action taken
-        if (totalOrderCount > 20) {
-            logger.info("[MYALGO] Total order count exceeded. No further orders.");
+        if (totalOrderCount > 10) {
             return NoAction.NoAction;
         }
 
@@ -61,18 +61,23 @@ public class MyAlgoLogic implements AlgoLogic {
             else {
                 return NoAction.NoAction;
             }
-        } 
+        } else {
             // Bid and Ask levels
             AskLevel bestAsk = state.getAskAt(0);
             BidLevel bestBid = state.getBidAt(0);
 
             // Create a buy order when price is cheap 
-            if (bestAsk != null && bestAsk.price <= cheapPriceThreshold) {
-                final long quantity = 100;
-                final long price = bestAsk.price;
-                logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
-                return new CreateChildOrder(Side.BUY, quantity, price);
+            try {
+                if (bestAsk != null && bestAsk.price <= cheapPriceThreshold) {
+                    final long quantity = 100;
+                    final long price = bestAsk.price;
+                    logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
+                    return new CreateChildOrder(Side.BUY, quantity, price);
+                } 
+            } catch (NullPointerException e) {
+                
             }
+            
 
             // Create sell order when price is high
             if (bestBid != null && bestBid.price >= expensivePriceThreshold) {
@@ -81,12 +86,12 @@ public class MyAlgoLogic implements AlgoLogic {
                 logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
                 return new CreateChildOrder(Side.BUY, quantity, price);
             }
+            
+        } 
 
             // No action if no conditions met
                 logger.info("[MYALGOADDCANCEL] No action taken.");
                 return NoAction.NoAction;
-
- 
         }
     }
 
