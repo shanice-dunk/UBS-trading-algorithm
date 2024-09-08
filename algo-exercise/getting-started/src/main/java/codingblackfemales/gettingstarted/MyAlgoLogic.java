@@ -40,6 +40,7 @@ public class MyAlgoLogic implements AlgoLogic {
         // Checks total number of child orders that have been created
         // If the number is greater than 20, no action taken
         if (totalOrderCount > 20) {
+            logger.info("[MYALGO] Total order count exceeded. No further orders.");
             return NoAction.NoAction;
         }
 
@@ -60,23 +61,23 @@ public class MyAlgoLogic implements AlgoLogic {
             else {
                 return NoAction.NoAction;
             }
-        } else {
+        } 
             // Bid and Ask levels
             AskLevel bestAsk = state.getAskAt(0);
             BidLevel bestBid = state.getBidAt(0);
 
             // Create a buy order when price is cheap 
             if (bestAsk != null && bestAsk.price <= cheapPriceThreshold) {
-                long quantity = 100;
-                long price = bestAsk.price;
+                final long quantity = 100;
+                final long price = bestAsk.price;
                 logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
                 return new CreateChildOrder(Side.BUY, quantity, price);
             }
 
             // Create sell order when price is high
             if (bestBid != null && bestBid.price >= expensivePriceThreshold) {
-                long quantity = 100;
-                long price = bestBid.price;
+                final long quantity = 100;
+                final long price = bestBid.price;
                 logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
                 return new CreateChildOrder(Side.BUY, quantity, price);
             }
@@ -85,7 +86,12 @@ public class MyAlgoLogic implements AlgoLogic {
                 logger.info("[MYALGOADDCANCEL] No action taken.");
                 return NoAction.NoAction;
 
-            // If there are no active orders, create new order
+ 
+        }
+    }
+
+
+           // If there are no active orders, create new order
             // Fetches best bid (highest price buyer is willing to pay)
             // BidLevel level = state.getBidAt(0);
             // Extracts price and quantity from bid level
@@ -94,6 +100,3 @@ public class MyAlgoLogic implements AlgoLogic {
             // Logs details of the order and returns CreateChildOrder action to buy specified quantity at specified price
             // logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
             // return new CreateChildOrder(Side.BUY, quantity, price);
-        }
-    }
-}
