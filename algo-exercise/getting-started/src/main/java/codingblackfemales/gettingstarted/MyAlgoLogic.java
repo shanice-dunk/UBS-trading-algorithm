@@ -6,7 +6,6 @@ import codingblackfemales.action.CreateChildOrder;
 import codingblackfemales.action.NoAction;
 import codingblackfemales.algo.AlgoLogic;
 import codingblackfemales.sotw.SimpleAlgoState;
-import codingblackfemales.sotw.marketdata.AskLevel;
 import codingblackfemales.sotw.marketdata.BidLevel;
 import codingblackfemales.util.Util;
 import messages.order.Side;
@@ -18,10 +17,6 @@ public class MyAlgoLogic implements AlgoLogic {
     // Logs messages during execution of the algo
     private static final Logger logger = LoggerFactory.getLogger(MyAlgoLogic.class);
 
-    // Price thresholds defined 
-    private static final long cheapPriceThreshold = 1000;
-    private static final long expensivePriceThreshold = 1500;
-
 
     @Override
     // evaluate - decision making
@@ -30,17 +25,17 @@ public class MyAlgoLogic implements AlgoLogic {
 
         // Add and cancel logic
         // Loggers run outputs of the current state of the order book
-        logger.info("[MYALGOADDCANCEL] In My Algo Logic....");
+        logger.info("[MYALGOLOGIC] In My Algo Logic....");
 
         var orderBookAsString = Util.orderBookToString(state);
 
-        logger.info("[MYALGO] The state of the order book is:\n" + orderBookAsString);
+        logger.info("[MYALGOLOGIC] The state of the order book is:\n" + orderBookAsString);
 
         var totalOrderCount = state.getActiveChildOrders().size();
 
         // Checks total number of child orders that have been created
         // If the number is greater than 20, no action taken
-        if (totalOrderCount > 10) {
+        if (totalOrderCount > 20) {
             return NoAction.NoAction;
         }
 
@@ -54,7 +49,7 @@ public class MyAlgoLogic implements AlgoLogic {
             // option.isPresent() - order found, logs that it will cancel order and returns the CancelChildOrder action
             if (option.isPresent()) {
                 var childOrder = option.get();
-                logger.info("[MYALGOADDCANCEL] Cancelling order:" + childOrder);
+                logger.info("[MYALGOLOGIC] Cancelling order:" + childOrder);
                 return new CancelChildOrder(childOrder);
             }
             // No action if no order is found
@@ -62,46 +57,16 @@ public class MyAlgoLogic implements AlgoLogic {
                 return NoAction.NoAction;
             }
         } else {
-            // Bid and Ask levels
-            AskLevel bestAsk = state.getAskAt(0);
-            BidLevel bestBid = state.getBidAt(0);
-
-            // Create a buy order when price is cheap 
-            try {
-                if (bestAsk != null && bestAsk.price <= cheapPriceThreshold) {
-                    final long quantity = 100;
-                    final long price = bestAsk.price;
-                    logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
-                    return new CreateChildOrder(Side.BUY, quantity, price);
-                } 
-            } catch (NullPointerException e) {
-                
-            }
-            
-
-            // Create sell order when price is high
-            if (bestBid != null && bestBid.price >= expensivePriceThreshold) {
-                final long quantity = 100;
-                final long price = bestBid.price;
-                logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
-                return new CreateChildOrder(Side.BUY, quantity, price);
-            }
-            
-        } 
-
-            // No action if no conditions met
-                logger.info("[MYALGOADDCANCEL] No action taken.");
-                return NoAction.NoAction;
+            // If there are no active orders, crrate new order
+            // Retrieve best bid level from the order book
+            BidLevel level = state.getBidAt(0);
+            // Extract price and quantity from top bid level
+            final long price = level.price;
+            final long quantity = level.quantity;
+            // Logs details of the order
+            logger.info("[MYALGOLOGIC] Adding order for" + quantity + "@" + price);
+            // Creates new buy order with given quantity and price
+            return new CreateChildOrder(Side.BUY, quantity, price);
         }
     }
-
-
-           // If there are no active orders, create new order
-            // Fetches best bid (highest price buyer is willing to pay)
-            // BidLevel level = state.getBidAt(0);
-            // Extracts price and quantity from bid level
-            // final long price = level.price;
-            // final long quantity = level.quantity;
-            // Logs details of the order and returns CreateChildOrder action to buy specified quantity at specified price
-            // logger.info("[MYALGOADDCANCEL] Adding order for" + quantity + "@" + price);
-            // return new CreateChildOrder(Side.BUY, quantity, price);
+}
