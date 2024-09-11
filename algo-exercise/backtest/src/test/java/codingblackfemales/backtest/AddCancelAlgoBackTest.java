@@ -35,7 +35,7 @@ public class AddCancelAlgoBackTest extends SequencerTestCase {
 
         final RunTrigger runTrigger = new RunTrigger();
         final Actioner actioner = new Actioner(sequencer);
-
+        // Creating new order book using market date channel
         final MarketDataChannel marketDataChannel = new MarketDataChannel(sequencer);
         final OrderChannel orderChannel = new OrderChannel(sequencer);
         final OrderBook book = new OrderBook(marketDataChannel, orderChannel);

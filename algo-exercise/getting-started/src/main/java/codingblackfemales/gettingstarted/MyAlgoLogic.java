@@ -3,12 +3,14 @@ package codingblackfemales.gettingstarted;
 import codingblackfemales.action.Action;
 import codingblackfemales.action.CancelChildOrder;
 import codingblackfemales.action.CreateChildOrder;
-import codingblackfemales.action.NoAction;
 import codingblackfemales.algo.AlgoLogic;
 import codingblackfemales.sotw.SimpleAlgoState;
 import codingblackfemales.sotw.marketdata.BidLevel;
 import codingblackfemales.util.Util;
 import messages.order.Side;
+
+import static codingblackfemales.action.NoAction.NoAction;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,12 +35,15 @@ public class MyAlgoLogic implements AlgoLogic {
 
         var totalOrderCount = state.getActiveChildOrders().size();
 
+        final BidLevel nearTouch = state.getBidAt(0);
+        long quantity = 150;
+        long price = nearTouch.price;
+
         // Checks total number of child orders that have been created
         // If the number is greater than 20, no action taken
-        if (totalOrderCount > 20) {
-            return NoAction.NoAction;
+        if (totalOrderCount > 25) {
+            return NoAction;
         }
-
         // Retrieves list of active child orders
         final var activeOrders = state.getActiveChildOrders();
 
@@ -54,19 +59,17 @@ public class MyAlgoLogic implements AlgoLogic {
             }
             // No action if no order is found
             else {
-                return NoAction.NoAction;
+                return NoAction;
             }
-        } else {
-            // If there are no active orders, crrate new order
-            // Retrieve best bid level from the order book
-            BidLevel level = state.getBidAt(0);
-            // Extract price and quantity from top bid level
-            final long price = level.price;
-            final long quantity = level.quantity;
-            // Logs details of the order
-            logger.info("[MYALGOLOGIC] Adding order for" + quantity + "@" + price);
-            // Creates new buy order with given quantity and price
+            // Incorporate passive logic to buy when close to the price
+        } if (state.getChildOrders().size() < 5) {
+            logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " children, want 5, joining passive side of book with: " + quantity + " @ " + price);
             return new CreateChildOrder(Side.BUY, quantity, price);
+        }  else {
+            logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " children, want 5 done.");
+            return NoAction;
         }
     }
 }
+
+// Track order book for 5 - 10 changes, find average price, use average to determine price is high or low

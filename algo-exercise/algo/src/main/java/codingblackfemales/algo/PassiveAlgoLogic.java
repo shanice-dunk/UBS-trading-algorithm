@@ -23,7 +23,7 @@ public class PassiveAlgoLogic implements AlgoLogic{
         final String book = Util.orderBookToString(state);
 
         logger.info("[PASSIVEALGO] Algo Sees Book as:\n" + book);
-
+        // Highest bid price available
         final BidLevel nearTouch = state.getBidAt(0);
 
         long quantity = 75;

@@ -58,7 +58,7 @@ public class PassiveAlgoBackTest extends SequencerTestCase {
 
         return sequencer;
     }
-
+    // Order book being created with price and quantity
     private UnsafeBuffer createSampleMarketDataTick(){
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
@@ -86,7 +86,7 @@ public class PassiveAlgoBackTest extends SequencerTestCase {
 
         return directBuffer;
     }
-
+    // Order book with different prices and values
     private UnsafeBuffer createSampleMarketDataTick2(){
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
