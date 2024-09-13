@@ -54,7 +54,7 @@ public class AddCancelAlgoLogic implements AlgoLogic {
                 return NoAction.NoAction;
             }
         } else {
-             // If there are no active orders, crrate new order
+             // If there are no active orders, create new order
             // Retrieve best bid level from the order book
             BidLevel level = state.getBidAt(0);
             // Extract price and quantity from top bid level

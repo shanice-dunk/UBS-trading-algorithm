@@ -1,7 +1,6 @@
 package codingblackfemales.gettingstarted;
 
 import codingblackfemales.algo.AlgoLogic;
-import codingblackfemales.algo.PassiveAlgoLogic;
 import codingblackfemales.container.Actioner;
 import codingblackfemales.container.AlgoContainer;
 import codingblackfemales.container.RunTrigger;
@@ -51,7 +50,7 @@ public class MyAlgoTest extends AbstractAlgoTest {
 
         container = new AlgoContainer(new MarketDataService(runTrigger), new OrderService(runTrigger), runTrigger, actioner);
         //set my algo logic
-        container.setLogic(new PassiveAlgoLogic());
+        container.setLogic(new MyAlgoLogic());
 
         network.addConsumer(new LoggingConsumer());
         network.addConsumer(container.getMarketDataService());

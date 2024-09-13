@@ -36,40 +36,37 @@ public class MyAlgoLogic implements AlgoLogic {
         var totalOrderCount = state.getActiveChildOrders().size();
 
         final BidLevel nearTouch = state.getBidAt(0);
-        long quantity = 150;
+        long quantity = 75;
         long price = nearTouch.price;
+        
 
         // Checks total number of child orders that have been created
         // If the number is greater than 20, no action taken
-        if (totalOrderCount > 25) {
+         if (totalOrderCount > 20) {
             return NoAction;
-        }
+         }
         // Retrieves list of active child orders
         final var activeOrders = state.getActiveChildOrders();
-
-        // If there are active orders, cancel 
-        if (activeOrders.size() > 0) {
-            // stream().findFirst - get first active order
-            final var option = activeOrders.stream().findFirst();
-            // option.isPresent() - order found, logs that it will cancel order and returns the CancelChildOrder action
-            if (option.isPresent()) {
-                var childOrder = option.get();
-                logger.info("[MYALGOLOGIC] Cancelling order:" + childOrder);
-                return new CancelChildOrder(childOrder);
+            
+        // Cancel any order that is not at the nearTouch price
+        for (var order : activeOrders) {
+            if (order.getPrice() != nearTouch.price) {
+                logger.info("[MYALGOLOGIC] Cancelling order at price: " + order.getPrice() + " (nearTouch is: " + nearTouch.price + ")");
+                return new CancelChildOrder(order);
             }
-            // No action if no order is found
-            else {
-                return NoAction;
-            }
+        }
             // Incorporate passive logic to buy when close to the price
-        } if (state.getChildOrders().size() < 5) {
-            logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " children, want 5, joining passive side of book with: " + quantity + " @ " + price);
+             if (state.getChildOrders().size() < 3) {
+            logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " children, want 3, joining passive side of book with: " + quantity + " @ " + price);
             return new CreateChildOrder(Side.BUY, quantity, price);
         }  else {
-            logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " children, want 5 done.");
-            return NoAction;
-        }
+            logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " children, want 3 done.");
+            return NoAction; 
+        }  
     }
 }
 
 // Track order book for 5 - 10 changes, find average price, use average to determine price is high or low
+
+// Cancellation logic is first before the order creation logic
+// Ensures that if there are any active orders, they are cancelled before checking the number of child orders

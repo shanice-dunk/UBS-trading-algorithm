@@ -1,6 +1,5 @@
 package codingblackfemales.gettingstarted;
 
-import codingblackfemales.algo.AddCancelAlgoLogic;
 import codingblackfemales.algo.AlgoLogic;
 import codingblackfemales.container.Actioner;
 import codingblackfemales.container.AlgoContainer;
@@ -64,7 +63,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
         container = new AlgoContainer(new MarketDataService(runTrigger), new OrderService(runTrigger), runTrigger, actioner);
         //set my algo logic
-        container.setLogic(new AddCancelAlgoLogic());
+        container.setLogic(new MyAlgoLogic());
 
         network.addConsumer(new LoggingConsumer());
         network.addConsumer(book);
@@ -143,7 +142,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         send(createTick());
 
         //ADD asserts when you have implemented your algo logic
-        assertEquals(container.getState().getChildOrders().size(), 21);
+        assertEquals(container.getState().getChildOrders().size(), 3);
 
         //when: market data moves towards us
         send(createTick2());
@@ -155,7 +154,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
 
         //and: check that our algo state was updated to reflect our fills when the market data
-        assertEquals(100, filledQuantity);
+        assertEquals(225, filledQuantity);
         
     }
 
