@@ -75,7 +75,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         return sequencer;
     }
 
-    protected UnsafeBuffer createTick(){
+    protected UnsafeBuffer createTickHighPrice(){
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
 
@@ -88,12 +88,12 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         encoder.source(Source.STREAM);
 
         encoder.bidBookCount(3)
-                .next().price(98L).size(100L)
+                .next().price(98L).size(100L) // High bid price
                 .next().price(95L).size(200L)
                 .next().price(91L).size(300L);
 
         encoder.askBookCount(4)
-                .next().price(100L).size(101L)
+                .next().price(100L).size(101L) // High ask price
                 .next().price(110L).size(200L)
                 .next().price(115L).size(5000L)
                 .next().price(119L).size(5600L);
@@ -103,7 +103,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         return directBuffer;
     }
 
-    protected UnsafeBuffer createTick2(){
+    protected UnsafeBuffer createTickLowPrice(){
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
 
@@ -116,13 +116,13 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         encoder.source(Source.STREAM);
 
         encoder.bidBookCount(3)
-                .next().price(95L).size(100L)
+                .next().price(95L).size(100L) // Low bid price
                 .next().price(93L).size(200L)
                 .next().price(91L).size(300L);
 
         encoder.askBookCount(4)
-                .next().price(98L).size(501L)
-                .next().price(101L).size(200L)
+                .next().price(90L).size(101L) // Low ask price
+                .next().price(91L).size(200L)
                 .next().price(110L).size(5000L)
                 .next().price(119L).size(5600L);
 
@@ -139,13 +139,13 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     @Test
     public void testExampleBackTest() throws Exception {
         //create a sample market data tick....
-        send(createTick());
+        send(createTickHighPrice());
 
         //ADD asserts when you have implemented your algo logic
         assertEquals(container.getState().getChildOrders().size(), 3);
 
         //when: market data moves towards us
-        send(createTick2());
+        send(createTickLowPrice());
 
         //then: get the state
         var state = container.getState();
@@ -154,7 +154,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
 
         //and: check that our algo state was updated to reflect our fills when the market data
-        assertEquals(225, filledQuantity);
+        assertEquals(300, filledQuantity);
         
     }
 
