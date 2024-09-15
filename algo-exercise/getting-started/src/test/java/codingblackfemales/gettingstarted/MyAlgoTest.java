@@ -60,7 +60,7 @@ public class MyAlgoTest extends AbstractAlgoTest {
         return sequencer;
     }
 
-    protected UnsafeBuffer createTickHighPrice(){
+    protected UnsafeBuffer createTick(){
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
 
@@ -73,12 +73,12 @@ public class MyAlgoTest extends AbstractAlgoTest {
         encoder.source(Source.STREAM);
 
         encoder.bidBookCount(3)
-                .next().price(98L).size(100L) // High bid price
+                .next().price(98L).size(100L) 
                 .next().price(95L).size(200L)
                 .next().price(91L).size(300L);
 
         encoder.askBookCount(4)
-                .next().price(100L).size(101L) // High ask price
+                .next().price(100L).size(101L) 
                 .next().price(110L).size(200L)
                 .next().price(115L).size(5000L)
                 .next().price(119L).size(5600L);
@@ -98,7 +98,8 @@ public class MyAlgoTest extends AbstractAlgoTest {
     public void testDispatchThroughSequencer() throws Exception {
 
         //create a sample market data tick....
-        send(createTickHighPrice());
+        send(createTick());
+
 
         //simple assert to check we had 3 orders created
         assertEquals(container.getState().getChildOrders().size(), 3);
