@@ -1,6 +1,7 @@
-import { Placeholder } from "../placeholder";
-//import { useMarketDepthData } from "./useMarketDepthData";
-//import { schemas } from "../../data/algo-schemas";
+// import { Placeholder } from "../placeholder";
+import { MarketDepthRow, useMarketDepthData } from "./useMarketDepthData";
+import { schemas } from "../../data/algo-schemas";
+import './MarketDepthFeature.css'
 
 // prettier-ignore
 // const testData: MarketDepthRow[] = [
@@ -20,6 +21,33 @@ import { Placeholder } from "../placeholder";
  * TODO
  */
 export const MarketDepthFeature = () => {
-  // const data = useMarketDepthData(schemas.prices);
-  return <Placeholder />;
+  const data = useMarketDepthData(schemas.prices);
+  return <div className="MarketDepthFeature">
+    <table>
+      <tr className="TableHeading">
+        <th></th>
+        <th colSpan={2}>Bid</th>
+        <th colSpan={2}>Ask</th>
+        </tr>
+        <tr>
+        <th></th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        </tr>
+        <tr>0</tr>
+        <tr>1</tr>
+        <tr>2</tr>
+        <tr>3</tr>
+        <tr>4</tr>
+        <tr>5</tr>
+        <tr>6</tr>
+        <tr>7</tr>
+        <tr>8</tr>
+        <tr>9</tr>
+    </table>
+  </div>
+  
+  // <Placeholder />;
 };

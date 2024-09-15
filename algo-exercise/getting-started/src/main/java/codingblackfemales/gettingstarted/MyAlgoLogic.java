@@ -50,6 +50,7 @@ public class MyAlgoLogic implements AlgoLogic {
 
         // Best bid price for buying
         final BidLevel nearTouch = state.getBidAt(0);
+        // Best price for selling
         final AskLevel bestAsk = state.getAskAt(0);
         
         long quantity = 50;
