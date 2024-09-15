@@ -20,8 +20,10 @@ import messages.marketdata.InstrumentStatus;
 import messages.marketdata.MessageHeaderEncoder;
 import messages.marketdata.Source;
 import messages.marketdata.Venue;
+// import messages.order.Side;
 
 import static org.junit.Assert.assertEquals;
+// import static org.junit.Assert.assertTrue;
 
 import java.nio.ByteBuffer;
 
@@ -152,13 +154,13 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
         //Check things like filled quantity, cancelled order count etc....
         long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
+
         
         //and: check that our algo state was updated to reflect our fills when the market data
         assertEquals(150, filledQuantity);
         
     }
 
-    
+}
 
     
-}
