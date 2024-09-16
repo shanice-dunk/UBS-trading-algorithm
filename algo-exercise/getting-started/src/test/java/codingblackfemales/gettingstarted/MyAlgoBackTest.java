@@ -90,12 +90,12 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         encoder.source(Source.STREAM);
 
         encoder.bidBookCount(3)
-                .next().price(98L).size(100L) 
+                .next().price(98L).size(100L)
                 .next().price(95L).size(200L)
                 .next().price(91L).size(300L);
 
         encoder.askBookCount(4)
-                .next().price(100L).size(101L) 
+                .next().price(100L).size(101L)
                 .next().price(110L).size(200L)
                 .next().price(115L).size(5000L)
                 .next().price(119L).size(5600L);
@@ -133,6 +133,34 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         return directBuffer;
     }
     
+    // protected UnsafeBuffer createTick3(){
+    //     final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
+    //     final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
+
+    //     //write the encoded output to the direct buffer
+    //     encoder.wrapAndApplyHeader(directBuffer, 0, headerEncoder);
+
+    //     //set the fields to desired values
+    //     encoder.venue(Venue.XLON);
+    //     encoder.instrumentId(123L);
+    //     encoder.source(Source.STREAM);
+
+    //     encoder.bidBookCount(3)
+    //             .next().price(105L).size(100L)
+    //             .next().price(103L).size(200L)
+    //             .next().price(101L).size(300L);
+
+    //     encoder.askBookCount(4)
+    //             .next().price(105L).size(501L)
+    //             .next().price(103L).size(200L)
+    //             .next().price(110L).size(5000L)
+    //             .next().price(119L).size(5600L);
+
+    //     encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
+
+    //     return directBuffer;
+    // }
+
     @Override
     public AlgoLogic createAlgoLogic() {
         return new MyAlgoLogic();
@@ -149,6 +177,8 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         //when: market data moves towards us
         send(createTick2());
 
+        // send(createTick3());
+
         //then: get the state
         var state = container.getState();
 
@@ -157,7 +187,8 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
         
         //and: check that our algo state was updated to reflect our fills when the market data
-        assertEquals(150, filledQuantity);
+        assertEquals(300, filledQuantity);
+        
         
     }
 

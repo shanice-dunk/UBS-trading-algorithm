@@ -87,3 +87,53 @@
 //     }
 
 // }
+
+// // Maximum number of sell
+// private static final int maxSellOrders = 3;
+
+// private static final long sellPriceThreshold = 110;
+
+//  // Best price for selling
+//  final AskLevel bestAsk = state.getAskAt(0);
+
+// // Sniper strategy to sell when price is high
+// if (bestAsk.price >= sellPriceThreshold && state.getChildOrders().size() < maxSellOrders) {
+//     logger.info("[MYALGOLOGIC] Selling at price: " + bestAsk.price + ", quantity: " + quantity);
+//     return new CreateChildOrder(Side.SELL, quantity, bestAsk.price);
+// }
+
+
+// protected double sellPriceThreshold() {
+    //     return 110; // If current market price is more than 110, algo will sell
+    // }
+        // // Method to define price threshold for low price
+        // protected double lowPriceThreshold() {
+        // return 104.50; // Buy if the price is below 104.50 (based on mid point in the order book)
+    
+
+
+    // // LOGIC 2 = price levels
+    // // Place multiple buy orders at different price levels
+    // if (state.getChildOrders().size() < maxBuyOrders) {
+    //     logger.info("[MYALGOLOGIC] Placing multiple buy orders.");
+    
+    //     // Defining multiple price levels for buy orders in array
+    //     // Buy at current price and two at lower price
+    //     long[] priceLevels = {price, price - 3, price - 4};
+    
+    //     // for loop to iterate through the price levels and place buy orders
+    //     for (long levelPrice : priceLevels) {
+    //         // Ensure number of buy orders stays within limit
+    //         if (state.getChildOrders().size() < maxBuyOrders) {
+    //             logger.info("[MYALGOLOGIC] Placing buy order for " + quantity + " @ " + levelPrice);
+    //             return new CreateChildOrder(Side.BUY, quantity, levelPrice);
+    //         }
+    //     }
+    // } 
+    // logger.info("[MYALGOLOGIC] No action taken.");
+    // return NoAction;
+    
+    // }
+    
+    // }
+    

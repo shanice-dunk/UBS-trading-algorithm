@@ -5,8 +5,8 @@ import codingblackfemales.action.CancelChildOrder;
 import codingblackfemales.action.CreateChildOrder;
 import codingblackfemales.algo.AlgoLogic;
 import codingblackfemales.sotw.SimpleAlgoState;
+// import codingblackfemales.sotw.marketdata.AskLevel;
 import codingblackfemales.sotw.marketdata.BidLevel;
-import codingblackfemales.sotw.marketdata.AskLevel;
 import codingblackfemales.util.Util;
 import messages.order.Side;
 
@@ -23,13 +23,9 @@ public class MyAlgoLogic implements AlgoLogic {
     // Maximum number of buy orders
     private static final int maxBuyOrders = 3;
 
-    // Maximum number of sell
-    private static final int maxSellOrders = 3;
-
     // Thresholds for buying and selling
     // Constant field that defines fixed value that doesn't change
-    private static final long buyPriceThreshold = 104;
-    private static final long sellPriceThreshold = 110;
+    private static final long buyPriceThreshold = 100;
     
 
 
@@ -50,10 +46,8 @@ public class MyAlgoLogic implements AlgoLogic {
 
         // Best bid price for buying
         final BidLevel nearTouch = state.getBidAt(0);
-        // Best price for selling
-        final AskLevel bestAsk = state.getAskAt(0);
         
-        long quantity = 50;
+        long quantity = 100;
         long price = nearTouch.price;
     
 
@@ -72,7 +66,6 @@ public class MyAlgoLogic implements AlgoLogic {
                 logger.info("[MYALGOLOGIC] Cancelling order at price: " + order.getPrice() + " (nearTouch is: " + nearTouch.price + ")");
                 // If order is priced too high, algo cancels
                 return new CancelChildOrder(order);
-                // Ensures algo stays competitive and doesn't have overpriced orders
             }
 
         }
@@ -81,18 +74,16 @@ public class MyAlgoLogic implements AlgoLogic {
         // Passive strategy when price is low
         if (price <= buyPriceThreshold && state.getChildOrders().size() < maxBuyOrders) {
             logger.info("[MYALGOLOGIC] Price is below or equal to threshold: " + buyPriceThreshold + ". Buying " + quantity + " @ " + price);
+            logger.info("[MYALGOLOGIC] Profit made based on buy threshold: " + (buyPriceThreshold - price));
             return new CreateChildOrder(Side.BUY, quantity, price);     
         } 
-        // Sniper strategy to sell when price is high
-        if (bestAsk.price >= sellPriceThreshold && state.getChildOrders().size() < maxSellOrders) {
-            logger.info("[MYALGOLOGIC] Selling at price: " + bestAsk.price + ", quantity: " + quantity);
-            return new CreateChildOrder(Side.SELL, quantity, bestAsk.price);
-        }
-        
-        logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " children done, wanted " + maxBuyOrders + ", order completed.");
+        // No action if all child orders done
+        logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders done, wanted" + maxBuyOrders + ", no action needed.");
             return NoAction;
         
     }   
+
+}
 
     //     // Methods define the price thresholds for when to buy or sell
     //     // Return values subject to change 
@@ -100,40 +91,7 @@ public class MyAlgoLogic implements AlgoLogic {
     //     return 104; // If current market price is less than 104, algo will buy
     // }
 
-    // protected double sellPriceThreshold() {
-    //     return 110; // If current market price is more than 110, algo will sell
-    // }
-        // // Method to define price threshold for low price
-        // protected double lowPriceThreshold() {
-        // return 104.50; // Buy if the price is below 104.50 (based on mid point in the order book)
-    }
-
-
-// // LOGIC 2 = price levels
-// // Place multiple buy orders at different price levels
-// if (state.getChildOrders().size() < maxBuyOrders) {
-//     logger.info("[MYALGOLOGIC] Placing multiple buy orders.");
-
-//     // Defining multiple price levels for buy orders in array
-//     // Buy at current price and two at lower price
-//     long[] priceLevels = {price, price - 3, price - 4};
-
-//     // for loop to iterate through the price levels and place buy orders
-//     for (long levelPrice : priceLevels) {
-//         // Ensure number of buy orders stays within limit
-//         if (state.getChildOrders().size() < maxBuyOrders) {
-//             logger.info("[MYALGOLOGIC] Placing buy order for " + quantity + " @ " + levelPrice);
-//             return new CreateChildOrder(Side.BUY, quantity, levelPrice);
-//         }
-//     }
-// } 
-// logger.info("[MYALGOLOGIC] No action taken.");
-// return NoAction;
-
-// }
-
-// }
-
+    
 
 // Track order book for 5 - 10 changes, find average price, use average to determine price is high or low
 
