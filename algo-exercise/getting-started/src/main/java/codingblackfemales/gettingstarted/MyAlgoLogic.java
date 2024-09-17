@@ -5,7 +5,7 @@ import codingblackfemales.action.CancelChildOrder;
 import codingblackfemales.action.CreateChildOrder;
 import codingblackfemales.algo.AlgoLogic;
 import codingblackfemales.sotw.SimpleAlgoState;
-// import codingblackfemales.sotw.marketdata.AskLevel;
+import codingblackfemales.sotw.marketdata.AskLevel;
 import codingblackfemales.sotw.marketdata.BidLevel;
 import codingblackfemales.util.Util;
 import messages.order.Side;
@@ -17,15 +17,16 @@ import org.slf4j.LoggerFactory;
 
 public class MyAlgoLogic implements AlgoLogic {
 
+
     // Logs messages during execution of the algo
     private static final Logger logger = LoggerFactory.getLogger(MyAlgoLogic.class);
 
     // Maximum number of buy orders
-    private static final int maxBuyOrders = 3;
+    private static final int maxBuyOrders = 5;
 
     // Thresholds for buying and selling
     // Constant field that defines fixed value that doesn't change
-    private static final long buyPriceThreshold = 100;
+    private static final long buyPriceThreshold = 110;
     
 
 
@@ -33,67 +34,97 @@ public class MyAlgoLogic implements AlgoLogic {
     // evaluate - decision making
     // Action - create or cancel orders
     public Action evaluate(SimpleAlgoState state) {
+       logger.info("[MYALGOLOGIC] In My Algo Logic...");
 
-        // Add and cancel logic
-        // Loggers run outputs of the current state of the order book
-        logger.info("[MYALGOLOGIC] In My Algo Logic....");
+       var orderBookAsString = Util.orderBookToString(state);
 
-        var orderBookAsString = Util.orderBookToString(state);
+       logger.info("[MYALGOLOGIC] The state of the order book is:\n" + orderBookAsString);
 
-        logger.info("[MYALGOLOGIC] The state of the order book is:\n" + orderBookAsString);
+       var totalOrderCount = state.getActiveChildOrders().size();
 
-        var totalOrderCount = state.getActiveChildOrders().size();
+       long quantity = 100;
 
-        // Best bid price for buying
-        final BidLevel nearTouch = state.getBidAt(0);
-        
-        long quantity = 100;
-        long price = nearTouch.price;
+       // Prevent over-trading by limiting the number of active orders
+       if (totalOrderCount > 15) {
+        return NoAction;
+       }
+
+    //    // Retrieves list of active child orders
+    //    final var activeOrders = state.getActiveChildOrders();
+    //    // Cancel active orders
+    //    if (activeOrders.size() > 0) {
+    //     // Get first active order
+    //     final var option = activeOrders.stream().findFirst();
+    //     // Order found, cancel order and return CancelChildOrder action
+    //     if (option.isPresent()) {
+    //         var childOrder = option.get();
+    //         logger.info("[MYALGOLOGIC] Cancelling order: " + childOrder);
+    //         return new CancelChildOrder(childOrder);
+    //     }
     
-
-        // Checks total number of child orders that have been created
-        // If the number is greater than 20, no action taken
-        // This prevents over-trading by limiting number of active orders
-         if (totalOrderCount > 20) {
-            return NoAction;
-         }
-        // Retrieves list of active child orders
-        final var activeOrders = state.getActiveChildOrders();
-            
-        // for loop to iterates over active orders and checks if prices are higher than order. If so, order is cancelled
-        for (var order : activeOrders) {
-            if (order.getPrice() > nearTouch.price) {
-                logger.info("[MYALGOLOGIC] Cancelling order at price: " + order.getPrice() + " (nearTouch is: " + nearTouch.price + ")");
-                // If order is priced too high, algo cancels
-                return new CancelChildOrder(order);
-            }
-
-        }
-        // LOGIC 1 = threshold
-        // Threshold logic to determine if the price is low
-        // Passive strategy when price is low
-        if (price <= buyPriceThreshold && state.getChildOrders().size() < maxBuyOrders) {
-            logger.info("[MYALGOLOGIC] Price is below or equal to threshold: " + buyPriceThreshold + ". Buying " + quantity + " @ " + price);
-            logger.info("[MYALGOLOGIC] Profit made based on buy threshold: " + (buyPriceThreshold - price));
-            return new CreateChildOrder(Side.BUY, quantity, price);     
-        } 
-        // No action if all child orders done
-        logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders done, wanted" + maxBuyOrders + ", no action needed.");
-            return NoAction;
-        
-    }   
-
-}
-
-    //     // Methods define the price thresholds for when to buy or sell
-    //     // Return values subject to change 
-    // protected double buyPriceThreshold() {
-    //     return 104; // If current market price is less than 104, algo will buy
     // }
 
-    
+       // Cancel orders price above the buyPriceThreshold
+       for (var childOrder : state.getActiveChildOrders()) {
+        if (childOrder.getPrice() > buyPriceThreshold) {
+            logger.info("[MYALGOLOGIC] Cancelling order at price: " + childOrder.getPrice() + ". Buy threshold is: " + buyPriceThreshold);
+            return new CancelChildOrder(childOrder);
+        }
+       }
 
-// Track order book for 5 - 10 changes, find average price, use average to determine price is high or low
+       // Calculate the average price of all bids and asks
+       long averagePrice = calculateAveragePrice(state);
 
-// Cancellation logic is first before the order creation logic
-// Ensures that if there are any active orders, they are cancelled before checking the number of child orders
+       // Log the average price
+       logger.info("[MYALGOLOGIC] Average price is: " + averagePrice);
+
+       // Place child order if average price is <= to buy threshold
+       // And if max buy orders have not been reached
+       if (averagePrice <= buyPriceThreshold && state.getChildOrders().size() < maxBuyOrders) {
+        logger.info("[MYALGOLOGIC] Average is is below or equal to buy threshold: " + buyPriceThreshold + ". Buying " + quantity + " @ " + averagePrice);
+        logger.info("[MYALGOLOGIC] Total profit to be made: £" + (buyPriceThreshold - averagePrice));
+        logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders completed, want " + maxBuyOrders);
+        return new CreateChildOrder(Side.BUY, quantity, averagePrice);
+       }
+
+       logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders completed, wanted " + maxBuyOrders + ", no action required.");
+       return NoAction;
+
+    }
+
+    // Method: calculate the average price of all bid and ask levels
+    private long calculateAveragePrice(SimpleAlgoState state) {
+        long priceSum = 0;
+        int priceCount = 0;
+
+        // Index for bid and ask levels
+        int i = 0;
+
+        // While loop to sum bid prices
+        // Continue loop while i < total number of bid levels
+        while (i < state.getBidLevels()) {
+            BidLevel bid = state.getBidAt(i); // Get bid levels at index i
+            priceSum += bid.price; // Add bid price to priceSum
+            priceCount++; // Increment count of prices
+            i++; // Increment index i for next iteration
+        }
+
+        // Reset index to 0 to iterate through ask levels
+        i = 0;
+
+        // While loop to sum ask prices
+        // Continue loop while i < total number of ask levels
+        while (i < state.getAskLevels()) {
+            AskLevel ask = state.getAskAt(i); // Get ask level at index i
+            priceSum += ask.price; // Add ask price to priceSum
+            priceCount++; // Increment count of prices
+            i++; // Increment index i for next iteration
+        }
+
+        // Return the average price
+        // True: priceCount == 0 - 0 is returned (when no proces to average)
+        // False: priceSum / priceCount != 0, expression returned
+        return (priceCount == 0) ? 0 : priceSum / priceCount;
+    }
+
+}

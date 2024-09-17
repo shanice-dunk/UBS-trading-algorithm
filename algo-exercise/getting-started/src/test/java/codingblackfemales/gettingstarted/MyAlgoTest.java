@@ -35,10 +35,7 @@ import org.junit.Test;
  */
 public class MyAlgoTest extends AbstractAlgoTest {
 
-    private final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
-    private final BookUpdateEncoder encoder = new BookUpdateEncoder();
-
-    private AlgoContainer container;
+    protected AlgoContainer container;
 
     @Override
     public Sequencer getSequencer() {
@@ -50,7 +47,7 @@ public class MyAlgoTest extends AbstractAlgoTest {
 
         container = new AlgoContainer(new MarketDataService(runTrigger), new OrderService(runTrigger), runTrigger, actioner);
         //set my algo logic
-        container.setLogic(new MyAlgoLogic());
+        container.setLogic(createAlgoLogic());
 
         network.addConsumer(new LoggingConsumer());
         network.addConsumer(container.getMarketDataService());
@@ -60,7 +57,17 @@ public class MyAlgoTest extends AbstractAlgoTest {
         return sequencer;
     }
 
+    @Override
+    public AlgoLogic createAlgoLogic() {
+        //this adds your algo logic to the container classes
+        return new MyAlgoLogic();
+    }
+
     protected UnsafeBuffer createTick(){
+
+        final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        final BookUpdateEncoder encoder = new BookUpdateEncoder();
+
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
 
@@ -70,29 +77,23 @@ public class MyAlgoTest extends AbstractAlgoTest {
         //set the fields to desired values
         encoder.venue(Venue.XLON);
         encoder.instrumentId(123L);
-        encoder.source(Source.STREAM);
+
+        encoder.askBookCount(3)
+                .next().price(100L).size(101L)
+                .next().price(110L).size(200L)
+                .next().price(115L).size(5000L);
 
         encoder.bidBookCount(3)
                 .next().price(98L).size(100L)
                 .next().price(95L).size(200L)
                 .next().price(91L).size(300L);
 
-        encoder.askBookCount(4)
-                .next().price(100L).size(101L)
-                .next().price(110L).size(200L)
-                .next().price(115L).size(5000L)
-                .next().price(119L).size(5600L);
-                
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
+        encoder.source(Source.STREAM);
 
         return directBuffer;
     }
 
-    @Override
-    public AlgoLogic createAlgoLogic() {
-        //this adds your algo logic to the container classes
-        return new MyAlgoLogic();
-    }
 
     @Test
     public void testDispatchThroughSequencer() throws Exception {
@@ -100,10 +101,8 @@ public class MyAlgoTest extends AbstractAlgoTest {
         //create a sample market data tick....
         send(createTick());
 
-
         //simple assert to check we had 3 orders created
-        assertEquals(container.getState().getChildOrders().size(), 3);
-
-        
+        assertEquals(container.getState().getChildOrders().size(), 5);
     }
+
 }

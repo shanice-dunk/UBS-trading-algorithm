@@ -15,6 +15,84 @@
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
 
+// // public class BuyLogic implements AlgoLogic {
+// // Average price logic
+//     private static final Logger logger = LoggerFactory.getLogger(BuyLogic.class);
+
+//     // Maximum number of buy orders
+//     private static final int maxBuyOrders = 3;
+
+//     // Threshold for buying
+//     private static final long buyPriceThreshold = 95;
+
+//     @Override
+//     public Action evaluate(SimpleAlgoState state) {
+//         logger.info("[MYALGOLOGIC] In My Algo Logic....");
+
+//         var totalOrderCount = state.getActiveChildOrders().size();
+//         long quantity = 100;
+
+//         // Prevent over-trading by limiting the number of active orders
+//         if (totalOrderCount > 20) {
+//             return NoAction;
+//         }
+
+//         // Cancel any orders priced above the buyPriceThreshold
+//         for (var order : state.getActiveChildOrders()) {
+//             if (order.getPrice() > buyPriceThreshold) {
+//                 logger.info("[MYALGOLOGIC] Cancelling order at price: " + order.getPrice() + ". Threshold is: " + buyPriceThreshold);
+//                 return new CancelChildOrder(order);
+//             }
+//         }
+
+//         // Calculate the average price of all bids and asks
+//         long averagePrice = calculateAveragePrice(state);
+
+//         // Log the average price
+//         logger.info("[MYALGOLOGIC] Average price calculated: " + averagePrice);
+
+//         // Place order if average price is <= to buy threshold
+//         // And if we haven't reached the maximum number of buy orders
+//         if (averagePrice <= buyPriceThreshold && state.getChildOrders().size() < maxBuyOrders) {
+//             logger.info("[MYALGOLOGIC] Average price is below or equal to threshold: " + buyPriceThreshold + ". Buying " + quantity + " @ " + averagePrice);
+//             return new CreateChildOrder(Side.BUY, quantity, averagePrice);
+//         }
+
+//         logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders done, wanted " + maxBuyOrders + ", no action needed.");
+//         return NoAction;
+//     }
+
+//     /**
+//      * Calculate the average price of all bid and ask levels
+//      */
+//     private long calculateAveragePrice(SimpleAlgoState state) {
+//         long totalPriceSum = 0;
+//         int totalPriceCount = 0;
+
+//         // Sum bid prices
+//         for (int i = 0; i < state.getBidLevels().size(); i++) {
+//             totalPriceSum += state.getBidAt(i).price;
+//             totalPriceCount++;
+//         }
+
+//         // Sum ask prices
+        // for (int i = 0; i < state.getAskLevels().size(); i++) {
+        //     totalPriceSum += state.getAskAt(i).price;
+        //     totalPriceCount++;
+        // }
+
+//         // Avoid division by zero in case no bids or asks are present
+//         if (totalPriceCount == 0) {
+//             logger.info("[MYALGOLOGIC] No valid bids or asks, no action taken.");
+//             return 0;
+//         }
+
+//         // Return the average price
+//         return totalPriceSum / totalPriceCount;
+//     }
+// }
+
+// Mid point logic
 // public class BuyLogic implements AlgoLogic {
 //     private static final Logger logger = LoggerFactory.getLogger(BuyLogic.class);
 

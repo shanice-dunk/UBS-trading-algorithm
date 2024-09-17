@@ -20,11 +20,8 @@ import messages.marketdata.InstrumentStatus;
 import messages.marketdata.MessageHeaderEncoder;
 import messages.marketdata.Source;
 import messages.marketdata.Venue;
-// import messages.order.Side;
 
 import static org.junit.Assert.assertEquals;
-// import static org.junit.Assert.assertTrue;
-
 import java.nio.ByteBuffer;
 
 import org.agrona.concurrent.UnsafeBuffer;
@@ -42,12 +39,12 @@ import org.junit.Test;
  * If you cancel the order your child order will show the order status as cancelled in the childOrders of the state object.
  *
  */
-public class MyAlgoBackTest extends AbstractAlgoBackTest {
+public class MyAlgoBackTest extends AbstractAlgoBackTest {  
     
     private final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
     private final BookUpdateEncoder encoder = new BookUpdateEncoder();
 
-    private AlgoContainer container;
+    protected AlgoContainer container;
 
     @Override
     public Sequencer getSequencer() {
@@ -56,7 +53,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
         final RunTrigger runTrigger = new RunTrigger();
         final Actioner actioner = new Actioner(sequencer);
-        // Creating new order book using market date channel
+
         final MarketDataChannel marketDataChannel = new MarketDataChannel(sequencer);
         final OrderChannel orderChannel = new OrderChannel(sequencer);
         final OrderBook book = new OrderBook(marketDataChannel, orderChannel);
@@ -77,7 +74,17 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         return sequencer;
     }
 
+    
+    @Override
+    public AlgoLogic createAlgoLogic() {
+        return new MyAlgoLogic();
+    }
+
     protected UnsafeBuffer createTick(){
+        // final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        // final BookUpdateEncoder encoder = new BookUpdateEncoder();
+
+
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
 
@@ -106,6 +113,10 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     }
 
     protected UnsafeBuffer createTick2(){
+
+        final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        final BookUpdateEncoder encoder = new BookUpdateEncoder();
+
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
 
@@ -132,39 +143,6 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
         return directBuffer;
     }
-    
-    // protected UnsafeBuffer createTick3(){
-    //     final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
-    //     final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
-
-    //     //write the encoded output to the direct buffer
-    //     encoder.wrapAndApplyHeader(directBuffer, 0, headerEncoder);
-
-    //     //set the fields to desired values
-    //     encoder.venue(Venue.XLON);
-    //     encoder.instrumentId(123L);
-    //     encoder.source(Source.STREAM);
-
-    //     encoder.bidBookCount(3)
-    //             .next().price(105L).size(100L)
-    //             .next().price(103L).size(200L)
-    //             .next().price(101L).size(300L);
-
-    //     encoder.askBookCount(4)
-    //             .next().price(105L).size(501L)
-    //             .next().price(103L).size(200L)
-    //             .next().price(110L).size(5000L)
-    //             .next().price(119L).size(5600L);
-
-    //     encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
-
-    //     return directBuffer;
-    // }
-
-    @Override
-    public AlgoLogic createAlgoLogic() {
-        return new MyAlgoLogic();
-    }
 
     @Test
     public void testExampleBackTest() throws Exception {
@@ -172,26 +150,18 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         send(createTick());
 
         //ADD asserts when you have implemented your algo logic
-        assertEquals(container.getState().getChildOrders().size(), 3);
+        assertEquals(container.getState().getChildOrders().size(), 5);
 
         //when: market data moves towards us
         send(createTick2());
-
-        // send(createTick3());
 
         //then: get the state
         var state = container.getState();
 
         //Check things like filled quantity, cancelled order count etc....
         long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
-
-        
         //and: check that our algo state was updated to reflect our fills when the market data
-        assertEquals(300, filledQuantity);
-        
-        
+        assertEquals(101, filledQuantity);
     }
 
 }
-
-    
