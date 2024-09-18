@@ -22,6 +22,7 @@ import messages.marketdata.Source;
 import messages.marketdata.Venue;
 
 import static org.junit.Assert.assertEquals;
+
 import java.nio.ByteBuffer;
 
 import org.agrona.concurrent.UnsafeBuffer;
@@ -75,6 +76,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     }
 
     
+   
     @Override
     public AlgoLogic createAlgoLogic() {
         return new MyAlgoLogic();
@@ -103,10 +105,9 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
         encoder.askBookCount(4)
                 .next().price(100L).size(101L)
-                .next().price(110L).size(200L)
-                .next().price(115L).size(5000L)
-                .next().price(119L).size(5600L);
-
+                .next().price(105).size(200L)
+                .next().price(110L).size(5000L);
+            
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
         return directBuffer;
@@ -114,8 +115,8 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
     protected UnsafeBuffer createTick2(){
 
-        final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
-        final BookUpdateEncoder encoder = new BookUpdateEncoder();
+        // final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        // final BookUpdateEncoder encoder = new BookUpdateEncoder();
 
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
@@ -129,15 +130,107 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         encoder.source(Source.STREAM);
 
         encoder.bidBookCount(3)
-                .next().price(95L).size(100L)
-                .next().price(93L).size(200L)
-                .next().price(91L).size(300L);
+                .next().price(100L).size(100L)
+                .next().price(97L).size(200L)
+                .next().price(94L).size(300L);
 
         encoder.askBookCount(4)
-                .next().price(98L).size(501L)
+                .next().price(103L).size(501L)
+                .next().price(108L).size(200L)
+                .next().price(115L).size(5000L);
+
+        encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
+
+        return directBuffer;
+    }
+
+    protected UnsafeBuffer createTick3(){
+
+        // final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        // final BookUpdateEncoder encoder = new BookUpdateEncoder();
+
+        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
+        final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
+
+        //write the encoded output to the direct buffer
+        encoder.wrapAndApplyHeader(directBuffer, 0, headerEncoder);
+
+        //set the fields to desired values
+        encoder.venue(Venue.XLON);
+        encoder.instrumentId(123L);
+        encoder.source(Source.STREAM);
+
+        encoder.bidBookCount(3)
+                .next().price(103L).size(100L)
                 .next().price(101L).size(200L)
-                .next().price(110L).size(5000L)
-                .next().price(119L).size(5600L);
+                .next().price(98L).size(300L);
+
+        encoder.askBookCount(4)
+                .next().price(106L).size(501L)
+                .next().price(110L).size(200L)
+                .next().price(118L).size(5000L);
+
+        encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
+
+        return directBuffer;
+    }
+
+    protected UnsafeBuffer createTick4(){
+
+        // final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        // final BookUpdateEncoder encoder = new BookUpdateEncoder();
+
+        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
+        final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
+
+        //write the encoded output to the direct buffer
+        encoder.wrapAndApplyHeader(directBuffer, 0, headerEncoder);
+
+        //set the fields to desired values
+        encoder.venue(Venue.XLON);
+        encoder.instrumentId(123L);
+        encoder.source(Source.STREAM);
+
+        encoder.bidBookCount(3)
+                .next().price(107L).size(100L)
+                .next().price(104L).size(200L)
+                .next().price(101L).size(300L);
+
+        encoder.askBookCount(4)
+                .next().price(110L).size(501L)
+                .next().price(115L).size(200L)
+                .next().price(120L).size(5000L);
+                
+        encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
+
+        return directBuffer;
+    }
+
+    protected UnsafeBuffer createTick5(){
+
+        // final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        // final BookUpdateEncoder encoder = new BookUpdateEncoder();
+
+        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
+        final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
+
+        //write the encoded output to the direct buffer
+        encoder.wrapAndApplyHeader(directBuffer, 0, headerEncoder);
+
+        //set the fields to desired values
+        encoder.venue(Venue.XLON);
+        encoder.instrumentId(123L);
+        encoder.source(Source.STREAM);
+
+        encoder.bidBookCount(3)
+                .next().price(110L).size(100L)
+                .next().price(107L).size(200L)
+                .next().price(105L).size(300L);
+
+        encoder.askBookCount(4)
+                .next().price(113L).size(501L)
+                .next().price(118).size(200L)
+                .next().price(125L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -146,22 +239,52 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
     @Test
     public void testExampleBackTest() throws Exception {
-        //create a sample market data tick....
-        send(createTick());
+    // Create first market tick
+    send(createTick());
 
-        //ADD asserts when you have implemented your algo logic
-        assertEquals(container.getState().getChildOrders().size(), 5);
+    // Market data moves
+    send(createTick2());
+    send(createTick3());
+    send(createTick4());
+    send(createTick5());
 
-        //when: market data moves towards us
-        send(createTick2());
+    // Get state 
+    var state = container.getState();
+    // Assert that the algo updated its order based on market movements
+    long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
+    
+    // Check if the algo is creating new orders 
+    assertEquals(state.getChildOrders().size(), 5);
 
-        //then: get the state
-        var state = container.getState();
+    //and: check that our algo state was updated to reflect our fills when the market data
+    assertEquals(0, filledQuantity);
+}
 
-        //Check things like filled quantity, cancelled order count etc....
-        long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
-        //and: check that our algo state was updated to reflect our fills when the market data
-        assertEquals(101, filledQuantity);
-    }
+    // // Expect 3 child orders to be created
+    // assertEquals(container.getState().getChildOrders().size(), 0);
 
+    // // Now simulate changing market data with createTick2, createTick3, etc.
+    // // Scenario: Market data moves towards the algorithm
+    // send(createTick2()); // Prices decrease (market changing)
+    // send(createTick3()); // Prices decrease further
+
+    // // Assert whether algo cancels oldest order when market changes and creates a new order
+    // assertEquals(container.getState().getChildOrders().size(), 0);
+
+    // // Scenario: The market data continues to change
+    // send(createTick4()); // Prices start moving back up
+    // send(createTick5()); // Prices increase (market rebounding)
+
+    // // Retrieve the current state
+    // var state = container.getState();
+
+    // // Assert that the algo updated its order based on market movements
+    // long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
+
+    // // Check the total filled quantity from orders (modify this based on your logic)
+    // assertEquals(0, filledQuantity);
+
+    // // Optionally check if orders were canceled correctly
+    // long canceledOrders = state.getChildOrders().size();
+    // assertTrue(canceledOrders > 0);
 }

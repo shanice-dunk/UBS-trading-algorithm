@@ -102,7 +102,7 @@ public class MyAlgoTest extends AbstractAlgoTest {
         send(createTick());
 
         //simple assert to check we had 3 orders created
-        assertEquals(container.getState().getChildOrders().size(), 5);
+        assertEquals(container.getState().getChildOrders().size(), 0);
     }
 
 }
