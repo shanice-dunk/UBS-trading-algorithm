@@ -47,6 +47,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
     protected AlgoContainer container;
 
+        
     @Override
     public Sequencer getSequencer() {
         final TestNetwork network = new TestNetwork();
@@ -83,8 +84,8 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     }
 
     protected UnsafeBuffer createTick(){
-        // final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
-        // final BookUpdateEncoder encoder = new BookUpdateEncoder();
+        final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        final BookUpdateEncoder encoder = new BookUpdateEncoder();
 
 
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
@@ -115,8 +116,9 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
     protected UnsafeBuffer createTick2(){
 
-        // final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
-        // final BookUpdateEncoder encoder = new BookUpdateEncoder();
+        final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        final BookUpdateEncoder encoder = new BookUpdateEncoder();
+
 
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
@@ -146,8 +148,9 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
     protected UnsafeBuffer createTick3(){
 
-        // final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
-        // final BookUpdateEncoder encoder = new BookUpdateEncoder();
+        final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        final BookUpdateEncoder encoder = new BookUpdateEncoder();
+
 
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
@@ -177,39 +180,9 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
     protected UnsafeBuffer createTick4(){
 
-        // final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
-        // final BookUpdateEncoder encoder = new BookUpdateEncoder();
+        final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        final BookUpdateEncoder encoder = new BookUpdateEncoder();
 
-        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
-        final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
-
-        //write the encoded output to the direct buffer
-        encoder.wrapAndApplyHeader(directBuffer, 0, headerEncoder);
-
-        //set the fields to desired values
-        encoder.venue(Venue.XLON);
-        encoder.instrumentId(123L);
-        encoder.source(Source.STREAM);
-
-        encoder.bidBookCount(3)
-                .next().price(107L).size(100L)
-                .next().price(104L).size(200L)
-                .next().price(101L).size(300L);
-
-        encoder.askBookCount(4)
-                .next().price(110L).size(501L)
-                .next().price(115L).size(200L)
-                .next().price(120L).size(5000L);
-                
-        encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
-
-        return directBuffer;
-    }
-
-    protected UnsafeBuffer createTick5(){
-
-        // final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
-        // final BookUpdateEncoder encoder = new BookUpdateEncoder();
 
         final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
@@ -224,13 +197,45 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
         encoder.bidBookCount(3)
                 .next().price(110L).size(100L)
-                .next().price(107L).size(200L)
-                .next().price(105L).size(300L);
+                .next().price(108L).size(200L)
+                .next().price(106L).size(300L);
 
         encoder.askBookCount(4)
-                .next().price(113L).size(501L)
-                .next().price(118).size(200L)
-                .next().price(125L).size(5000L);
+                .next().price(115L).size(501L)
+                .next().price(119L).size(200L)
+                .next().price(123L).size(5000L);
+                
+        encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
+
+        return directBuffer;
+    }
+
+    protected UnsafeBuffer createTick5(){
+
+        final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+        final BookUpdateEncoder encoder = new BookUpdateEncoder();
+
+
+        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
+        final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
+
+        //write the encoded output to the direct buffer
+        encoder.wrapAndApplyHeader(directBuffer, 0, headerEncoder);
+
+        //set the fields to desired values
+        encoder.venue(Venue.XLON);
+        encoder.instrumentId(123L);
+        encoder.source(Source.STREAM);
+
+        encoder.bidBookCount(3)
+                .next().price(114L).size(100L)
+                .next().price(110L).size(200L)
+                .next().price(108L).size(300L);
+
+        encoder.askBookCount(4)
+                .next().price(120L).size(501L)
+                .next().price(124).size(200L)
+                .next().price(127L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -254,7 +259,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
     
     // Check if the algo is creating new orders 
-    assertEquals(state.getChildOrders().size(), 5);
+    assertEquals(state.getChildOrders().size(), 3);
 
     //and: check that our algo state was updated to reflect our fills when the market data
     assertEquals(0, filledQuantity);

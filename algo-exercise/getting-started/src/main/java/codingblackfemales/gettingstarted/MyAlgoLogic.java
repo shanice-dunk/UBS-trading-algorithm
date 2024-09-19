@@ -6,7 +6,6 @@ import codingblackfemales.action.CreateChildOrder;
 import codingblackfemales.algo.AlgoLogic;
 import codingblackfemales.sotw.SimpleAlgoState;
 import codingblackfemales.sotw.marketdata.AskLevel;
-//import codingblackfemales.sotw.marketdata.AskLevel;
 import codingblackfemales.sotw.marketdata.BidLevel;
 import codingblackfemales.util.Util;
 import messages.order.Side;
@@ -22,8 +21,10 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
     private static final Logger logger = LoggerFactory.getLogger(MyAlgoLogic.class);
 
     // History of highest bid prices and lowest ask price to analyse trends which are stored in two lists
-    private final List<Double> nearTouchBidPrices = new LinkedList<>();
-    private final List<Double> nearTouchAskPrices = new LinkedList<>();
+    private final List<Double> nearTouchBidPricesList = new LinkedList<>();
+    private final List<Double> nearTouchAskPricesList = new LinkedList<>();
+    // private final List<Double> farTouchBidPricesList = new LinkedList<>();
+    // private final List<Double> farTouchAskPricesList = new LinkedList<>();
 
     // List hold the last 3 values of the bid and ask prices
     // Small window of price history for analysis
@@ -46,25 +47,39 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
         // Get highest bid price from order book
         final BidLevel nearTouchBid = state.getBidAt(0);
         long bidQuantity = 100;
-        long bidPrice = nearTouchBid.price;
+        long nearBidPrice = nearTouchBid.price;
 
         // Get lowest ask price from order book
         final AskLevel nearTouchAsk = state.getAskAt(0);
         long askQuantity = 100;
-        long askPrice = nearTouchAsk.price;
+        long nearAskPrice = nearTouchAsk.price;
+
+        // // Get lowest bid in the order book
+        // final BidLevel farTouchBid = state.getBidAt(state.getBidLevels() - 1);
+        // long farBidPrice = farTouchBid.price;
+
+        // // Get highest ask in the order book
+        // final AskLevel farTouchAsk = state.getAskAt(state.getAskLevels() -1);
+        // long farAskPrice = farTouchAsk.price;
 
         // Update the near touch bid and ask prices in the lists
-        updateNearTouch(nearTouchBidPrices, bidPrice);
-        updateNearTouch(nearTouchAskPrices, askPrice);
+        updatePrices(nearTouchBidPricesList, nearBidPrice);
+        updatePrices(nearTouchAskPricesList, nearAskPrice);
+        // updatePrices(farTouchBidPricesList, farBidPrice);
+        // updatePrices(farTouchAskPricesList, farAskPrice);
 
         // Determine trend for both bid and ask prices 
         // Call getPrice method on updated price lists
-        PriceTrend bidTrend = getPrice(nearTouchBidPrices);
-        PriceTrend askTrend = getPrice(nearTouchAskPrices);
+        PriceTrend nearTouchBidTrend = getPrice(nearTouchBidPricesList);
+        PriceTrend nearTouchAskTrend = getPrice(nearTouchAskPricesList);
+        // PriceTrend farTouchBidTrend = getPrice(farTouchBidPricesList);
+        // PriceTrend farTouchAskTrend = getPrice(farTouchAskPricesList);
 
         // Logs the trends for the bid and ask prices
-        logger.info("[MYALGOLOGIC] Bid price trend is: " + bidTrend);
-        logger.info("[MYALGOLOGIC] Ask price trend is: " + askTrend);
+        logger.info("[MYALGOLOGIC] Near touch bid price trend is: " + nearTouchBidTrend);
+        logger.info("[MYALGOLOGIC] Near touch ask price trend is: " + nearTouchAskTrend);
+        // logger.info("[MYALGOLOGIC] Far touch bid price trend is: " + farTouchBidTrend);
+        // logger.info("[MYALGOLOGIC] Far touch ask price trend is: " + farTouchAskTrend);
 
         // Retrieve list of current active child orders
         final var activeOrders = state.getActiveChildOrders();
@@ -88,16 +103,16 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
         // If less than 5 child orders, create new order based on trend
         if (state.getChildOrders().size() < 5) {
             // Decide to buy or sell based on trends
-            // If bid price is in upward trend, create buy order
-            if (bidTrend == PriceTrend.DOWN) {
+            // Buy when near touch bid is downward trend 
+            if (nearTouchBidTrend == PriceTrend.DownwardTrend) {
                 // Create buy order if price is trending up
-                logger.info("[MYALGOLOGIC] Bid price in downward trend. Place buy order with: " + bidQuantity + " @ " + bidPrice);
-                return new CreateChildOrder(Side.BUY, bidQuantity, bidPrice);
-            // If ask price is in upward trend, create sell order
-            } if (askTrend == PriceTrend.UP) {
+                logger.info("[MYALGOLOGIC] Bid price in downward trend. Place buy order with: " + bidQuantity + " @ " + nearBidPrice);
+                return new CreateChildOrder(Side.BUY, bidQuantity, nearBidPrice);
+            // Sell when the near or far touch ask price is in upward trend
+            } if (nearTouchAskTrend == PriceTrend.UpwardTrend) {
                 // Create sell order if ask price is trending up
-                logger.info("[MYALGOLOGIC] Ask price in upward trend. Placing sell order with: " + askQuantity + " @ " + askPrice);
-                return new CreateChildOrder(Side.SELL, askQuantity, askPrice);
+                logger.info("[MYALGOLOGIC] Ask price in upward trend. Placing sell order with: " + askQuantity + " @ " + nearAskPrice);
+                return new CreateChildOrder(Side.SELL, askQuantity, nearAskPrice);
             } else {
                 // No action if there is no trend
                 logger.info("[MYALGOLOGIC] No clear price trend, no action required.");
@@ -112,7 +127,7 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
     }
     // Method maintains a list of most recent prices
     // If list exceeds maxPriceHistory, remove the oldest price and add new one
-    private void updateNearTouch(List<Double> priceList, long price) {
+    private void updatePrices(List<Double> priceList, long price) {
         if (priceList.size() == maxPriceHistory) {
             priceList.remove(0); // Remove the oldest price
         }
@@ -122,28 +137,31 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
     // Method to determine if prices are trending up or down
     private PriceTrend getPrice(List<Double> priceList) {
         if (priceList.size() < 2) {
-            return PriceTrend.NONE; // Not enough data
+            return PriceTrend.NoTrend; // Not enough data
         }
 
+        // Retrieve the most recent prices from price list
+        // Index of the last element
         Double lastPrice = priceList.get(priceList.size() - 1);
+        // Index od the second to last element 
         Double previousPrice = priceList.get(priceList.size() - 2);
 
         if (lastPrice > previousPrice) {
-            // Returns UP if latest price is higher
-            return PriceTrend.UP;
+            // Returns UpwardTrend if latest price is higher
+            return PriceTrend.UpwardTrend;
         } else if (lastPrice < previousPrice) {
-            // Returns DOWN of latest price is lower
-            return PriceTrend.DOWN;
+            // Returns DownwardTrend of latest price is lower
+            return PriceTrend.DownwardTrend;
         } else {
-            // Returns NONE if price is unchanged or not enough data
-            return PriceTrend.NONE;
+            // Returns NoTrend if price is unchanged or not enough data
+            return PriceTrend.NoTrend;
         }
     }
 
-    // Define enum for trends UP, DOWN, NONE
+    // Define enum for trends UpwardTrend, DownwardTrend and NoTrend
     // enum = enumeration, represents fixed set of named constants 
     private enum PriceTrend {
-        UP, DOWN, NONE;
+        UpwardTrend, DownwardTrend, NoTrend;
     }
 
     }
