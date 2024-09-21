@@ -28,7 +28,7 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
 
     // List hold the last 3 values of the bid and ask prices
     // Small window of price history for analysis
-    private static final int maxPriceHistory = 5;
+    private static final int maxPriceHistory = 10;
 
     @Override
     // evaluate - decision making
@@ -85,7 +85,7 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
         final var activeOrders = state.getActiveChildOrders();
 
         // Cancel if there are 3 active child orders
-        if (activeOrders.size() == 3) {
+        if (activeOrders.size() > 0) {
             // stream().findFirst - get first active order
             final var option = activeOrders.stream().findFirst();
             // option.isPresent() - order found, logs that it will cancel order and returns the CancelChildOrder action
@@ -165,6 +165,11 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
     }
 
     }
+
+    // TO DO (20.09.24)
+    // 10 maxPriceHistory - DONE
+    // Check this line - add value to book to fill quantity - DONE (filleQuantity = 100 as found matching order)
+    // Check tick 4 and 5 - DONE
 
      
 //         // Best bid price for buying

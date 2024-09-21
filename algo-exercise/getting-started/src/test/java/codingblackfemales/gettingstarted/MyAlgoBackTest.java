@@ -42,8 +42,8 @@ import org.junit.Test;
  */
 public class MyAlgoBackTest extends AbstractAlgoBackTest {  
     
-    private final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
-    private final BookUpdateEncoder encoder = new BookUpdateEncoder();
+    // private final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
+    // private final BookUpdateEncoder encoder = new BookUpdateEncoder();
 
     protected AlgoContainer container;
 
@@ -88,7 +88,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         final BookUpdateEncoder encoder = new BookUpdateEncoder();
 
 
-        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
+        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(2000);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
 
         //write the encoded output to the direct buffer
@@ -99,15 +99,19 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(3)
+        encoder.bidBookCount(5)
                 .next().price(98L).size(100L)
                 .next().price(95L).size(200L)
-                .next().price(91L).size(300L);
+                .next().price(91L).size(300L)
+                .next().price(90L).size(400L)
+                .next().price(89L).size(500L);
 
-        encoder.askBookCount(4)
-                .next().price(100L).size(101L)
-                .next().price(105).size(200L)
-                .next().price(110L).size(5000L);
+        encoder.askBookCount(5)
+                .next().price(99L).size(101L)
+                .next().price(100L).size(200L)
+                .next().price(101L).size(300L)
+                .next().price(103L).size(500L)
+                .next().price(104L).size(5000L);
             
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -120,7 +124,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         final BookUpdateEncoder encoder = new BookUpdateEncoder();
 
 
-        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
+        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(2000);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
 
         //write the encoded output to the direct buffer
@@ -131,15 +135,19 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(3)
-                .next().price(100L).size(100L)
-                .next().price(97L).size(200L)
-                .next().price(94L).size(300L);
+        encoder.bidBookCount(5)
+                .next().price(101L).size(100L)
+                .next().price(99L).size(200L)
+                .next().price(97L).size(300L)
+                .next().price(96L).size(400L)
+                .next().price(94L).size(500L);
 
-        encoder.askBookCount(4)
-                .next().price(103L).size(501L)
-                .next().price(108L).size(200L)
-                .next().price(115L).size(5000L);
+        encoder.askBookCount(5)
+                .next().price(101L).size(101L)
+                .next().price(103L).size(200L)
+                .next().price(104L).size(300L)
+                .next().price(105L).size(500L)
+                .next().price(110L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -152,7 +160,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         final BookUpdateEncoder encoder = new BookUpdateEncoder();
 
 
-        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
+        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(2000);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
 
         //write the encoded output to the direct buffer
@@ -163,15 +171,19 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(3)
+        encoder.bidBookCount(5)
                 .next().price(103L).size(100L)
                 .next().price(101L).size(200L)
-                .next().price(98L).size(300L);
+                .next().price(98L).size(300L)
+                .next().price(97L).size(400L)
+                .next().price(94L).size(500L);
 
-        encoder.askBookCount(4)
-                .next().price(106L).size(501L)
-                .next().price(110L).size(200L)
-                .next().price(118L).size(5000L);
+        encoder.askBookCount(5)
+                .next().price(103L).size(101L)
+                .next().price(105L).size(200L)
+                .next().price(108L).size(300L)
+                .next().price(110L).size(500L)
+                .next().price(113L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -183,8 +195,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
         final BookUpdateEncoder encoder = new BookUpdateEncoder();
 
-
-        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
+        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(2000);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
 
         //write the encoded output to the direct buffer
@@ -195,28 +206,32 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(3)
-                .next().price(110L).size(100L)
-                .next().price(108L).size(200L)
-                .next().price(106L).size(300L);
+        encoder.bidBookCount(5)
+                .next().price(105L).size(100L)
+                .next().price(103L).size(200L)
+                .next().price(102L).size(300L)
+                .next().price(100L).size(400L)
+                .next().price(99L).size(500L);
 
-        encoder.askBookCount(4)
-                .next().price(115L).size(501L)
-                .next().price(119L).size(200L)
-                .next().price(123L).size(5000L);
-                
+        encoder.askBookCount(5)
+                .next().price(103L).size(101L)
+                .next().price(105L).size(200L)
+                .next().price(108L).size(300L)
+                .next().price(110L).size(500L)
+                .next().price(113L).size(5000L);
+
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
         return directBuffer;
     }
+
 
     protected UnsafeBuffer createTick5(){
 
         final MessageHeaderEncoder headerEncoder = new MessageHeaderEncoder();
         final BookUpdateEncoder encoder = new BookUpdateEncoder();
 
-
-        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
+        final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(2000);
         final UnsafeBuffer directBuffer = new UnsafeBuffer(byteBuffer);
 
         //write the encoded output to the direct buffer
@@ -227,15 +242,19 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(3)
-                .next().price(114L).size(100L)
-                .next().price(110L).size(200L)
-                .next().price(108L).size(300L);
+        encoder.bidBookCount(5)
+                .next().price(103L).size(100L)
+                .next().price(101L).size(200L)
+                .next().price(98L).size(300L)
+                .next().price(97L).size(400L)
+                .next().price(96L).size(500L);
 
-        encoder.askBookCount(4)
-                .next().price(120L).size(501L)
-                .next().price(124).size(200L)
-                .next().price(127L).size(5000L);
+        encoder.askBookCount(5)
+                .next().price(101L).size(101L)
+                .next().price(103L).size(200L)
+                .next().price(105L).size(300L)
+                .next().price(107L).size(500L)
+                .next().price(110L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -256,13 +275,14 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     // Get state 
     var state = container.getState();
     // Assert that the algo updated its order based on market movements
+
     long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
     
     // Check if the algo is creating new orders 
-    assertEquals(state.getChildOrders().size(), 3);
+    assertEquals(state.getChildOrders().size(), 4); 
 
     //and: check that our algo state was updated to reflect our fills when the market data
-    assertEquals(0, filledQuantity);
+    assertEquals(100, filledQuantity);
 }
 
     // // Expect 3 child orders to be created
