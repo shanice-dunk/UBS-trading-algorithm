@@ -9,17 +9,16 @@ interface QuantityCellProps {
 }
 
 export const QuantityCell = ({quantity, previousQuantity}: QuantityCellProps) => {
-    // Determine arrow direction based on quantity change
-    const getQuantityArrow = () => {
-        if (previousQuantity === null) return null; // No arrow for first render
-        if (quantity > previousQuantity) return <span className="arrowUp">⬆</span>; // Quantity increased
-        if (quantity < previousQuantity) return <span className="arrowDown">⬇</span>; // Quantity decreased
-        return "➖"; // No change
+    const getQuantityChange = () => {
+        if (previousQuantity === null) return ""; // No class for first render
+        if (quantity > previousQuantity) return "quantityIncrease"; // Quantity increased
+        if (quantity < previousQuantity) return "quantityDecrease"; // Quantity decreased
+        return ""; // No change
     };
 
     return (
-        <td>
-            {quantity} <span className="arrow">{getQuantityArrow()}</span>
+        <td className={getQuantityChange()}>
+            {quantity}
         </td>
-    )
-}
+    );
+};

@@ -1,21 +1,22 @@
+import { useEffect, useRef } from "react";
 import { MarketDepthRow } from "./useMarketDepthData";
 import { PriceCell } from "./PriceCell";
-import { useState, useEffect } from "react";
 import { QuantityCell } from "./QuantityCell";
-
 
 interface MarketDepthPanelProps {
     data: MarketDepthRow[];
 }
 
-export const MarketDepthPanel = ({data}: MarketDepthPanelProps) => {
-    const [previousData, setPreviousData] = useState<MarketDepthRow[] | null>(null);
+export const MarketDepthPanel = ({ data }: MarketDepthPanelProps) => {
+    const previousDataRef = useRef<MarketDepthRow[] | null>(null);  // Use useRef to store previous data
 
     useEffect(() => {
-        // On every data update, set the current data as the previous data for comparison
-        setPreviousData(data);
+        // Update the ref to store the current data
+        previousDataRef.current = data;
     }, [data]);
+
     return (
+        <div className="table-container">
         <table>
             <thead>
                 <tr>
@@ -32,21 +33,33 @@ export const MarketDepthPanel = ({data}: MarketDepthPanelProps) => {
                 </tr>
             </thead>
             <tbody>
-                {data.map((row, index) => (
-                    <tr key={row.symbolLevel}>
-                    <td>{row.level}</td>
-                    <td>{row.bidQuantity}</td>
-                    <PriceCell
-                        price={row.bid}
-                        previousPrice={previousData ? previousData[index]?.bid : null}/>
-                    <td>{row.offer}</td>
-                    <QuantityCell
-                        quantity={row.offerQuantity}
-                        previousQuantity={previousData ? previousData[index]?.offerQuantity : null}
-                    />   
-                    </tr>
-                ))}
+                {data.map((row) => {
+                    // Compare the current row with the previous row based on symbolLevel
+                    const previousRow = previousDataRef.current?.find(prev => prev.symbolLevel === row.symbolLevel);
+                    return (
+                        <tr key={row.symbolLevel}>
+                            <td>{row.level}</td>
+                            <QuantityCell
+                                quantity={row.bidQuantity}
+                                previousQuantity={previousRow ? previousRow.bidQuantity : null}
+                            />
+                            <PriceCell
+                                price={row.bid}
+                                previousPrice={previousRow ? previousRow.bid : null}
+                            />
+                            <PriceCell
+                                price={row.offer}
+                                previousPrice={previousRow ? previousRow.offer : null}
+                            />
+                            <QuantityCell
+                                quantity={row.offerQuantity}
+                                previousQuantity={previousRow ? previousRow.offerQuantity : null}
+                            />
+                        </tr>
+                    );
+                })}
             </tbody>
         </table>
-    )
+    </div>
+    );
 };

@@ -1,12 +1,22 @@
+/* Flex container for centering the table */
+.table-container {
+  display: flex;
+  justify-content: center; /* Horizontal centering */
+  align-items: center;     /* Vertical centering */
+  height: 100vh;           /* Full viewport height */
+}
+
 table {
-  width: 100%;
-  border-collapse: collapse;
+    border-collapse: collapse;
+    width: 60%;              /* Adjust width as needed */
+    max-width: 1000px;        /* Prevent table from being too wide */
+    margin: 0 auto;           /* Ensure the table is centered */
 }
 
 th, td {
-  padding: 8px;
-  text-align: centre;
-  border: 1px solid #ddd;
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
 }
 
 thead {
@@ -29,4 +39,13 @@ tbody tr:nth-child(even) {
 
 .arrowDown {
   color: black;
+}
+
+.quantityIncrease {
+  background-color: #54cc33;
+}
+
+.quantityDecrease {
+  background-color: #FF321E;
+  color: white;
 }
