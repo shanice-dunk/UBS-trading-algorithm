@@ -1,16 +1,32 @@
-/* .MarketDepthFeature {
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-    background: white;
-    height: 100%;
-    width: 50%
-   
-   }
+th, td {
+  padding: 8px;
+  text-align: centre;
+  border: 1px solid #ddd;
+}
 
-   table, tr, th {
-    border: 1px solid black;
-    border-collapse: collapse;
-  }
+thead {
+  background-color: #f2f2f2;
+}
 
-.TableHeading {
-    font-weight: bold;
-} */
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.arrow {
+  font-size: 12px;
+  margin-left: 5px;
+  color: black;
+}
+
+.arrowUp {
+  color: black;
+}
+
+.arrowDown {
+  color: black;
+}

@@ -282,7 +282,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     assertEquals(state.getChildOrders().size(), 4); 
 
     //and: check that our algo state was updated to reflect our fills when the market data
-    assertEquals(100, filledQuantity);
+    assertEquals(100, filledQuantity); // One match
 }
 
     // // Expect 3 child orders to be created

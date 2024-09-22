@@ -1,9 +1,9 @@
 // import { Placeholder } from "../placeholder";
-// import { useMarketDepthData } from "./useMarketDepthData";
-// import { schemas } from "../../data/algo-schemas";
+import { useMarketDepthData } from "./useMarketDepthData";
+import { schemas } from "../../data/algo-schemas";
 import { MarketDepthPanel } from "./MarketDepthPanel";
 import { MarketDepthRow } from "./useMarketDepthData";
-// import './MarketDepthFeature.css'
+import './MarketDepthFeature.css'
 
 // prettier-ignore
 const data: MarketDepthRow[] = [
@@ -23,7 +23,7 @@ const data: MarketDepthRow[] = [
  * TODO
  */
 export const MarketDepthFeature = () => {
-  // const data = useMarketDepthData(schemas.prices); - uncomment when wanting data to run
+  const data = useMarketDepthData(schemas.prices); // uncomment when wanting data to run
   return <MarketDepthPanel data={data}/>;
 
   // return <Placeholder />;
