@@ -3,8 +3,6 @@ import { useMarketDepthData } from "./useMarketDepthData";
 import { schemas } from "../../data/algo-schemas";
 import { MarketDepthPanel } from "./MarketDepthPanel";
 import { MarketDepthRow } from "./useMarketDepthData";
-import { PriceCell } from "./PriceCell";
-import { QuantityCell } from "./QuantityCell";
 import './MarketDepthFeature.css'
 
 // prettier-ignore
