@@ -1,16 +1,15 @@
-/* Flex container for centering the table */
 .table-container {
   display: flex;
-  justify-content: center; /* Horizontal centering */
-  align-items: center;     /* Vertical centering */
-  height: 100vh;           /* Full viewport height */
+  justify-content: center; 
+  align-items: center;   
+  height: 100vh;        
 }
 
 table {
     border-collapse: collapse;
-    width: 60%;              /* Adjust width as needed */
-    max-width: 1000px;        /* Prevent table from being too wide */
-    margin: 0 auto;           /* Ensure the table is centered */
+    width: 60%;             
+    max-width: 1000px;      
+    margin: 0 auto;          
 }
 
 th, td {
