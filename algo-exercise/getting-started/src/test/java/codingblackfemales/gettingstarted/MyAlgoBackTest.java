@@ -279,37 +279,10 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
     
     // Check if the algo is creating new orders 
-    assertEquals(state.getChildOrders().size(), 4); 
+    assertEquals(state.getChildOrders().size(), 5); 
 
     //and: check that our algo state was updated to reflect our fills when the market data
-    assertEquals(100, filledQuantity); // One match
+    assertEquals(0, filledQuantity); // One match
 }
 
-    // // Expect 3 child orders to be created
-    // assertEquals(container.getState().getChildOrders().size(), 0);
-
-    // // Now simulate changing market data with createTick2, createTick3, etc.
-    // // Scenario: Market data moves towards the algorithm
-    // send(createTick2()); // Prices decrease (market changing)
-    // send(createTick3()); // Prices decrease further
-
-    // // Assert whether algo cancels oldest order when market changes and creates a new order
-    // assertEquals(container.getState().getChildOrders().size(), 0);
-
-    // // Scenario: The market data continues to change
-    // send(createTick4()); // Prices start moving back up
-    // send(createTick5()); // Prices increase (market rebounding)
-
-    // // Retrieve the current state
-    // var state = container.getState();
-
-    // // Assert that the algo updated its order based on market movements
-    // long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
-
-    // // Check the total filled quantity from orders (modify this based on your logic)
-    // assertEquals(0, filledQuantity);
-
-    // // Optionally check if orders were canceled correctly
-    // long canceledOrders = state.getChildOrders().size();
-    // assertTrue(canceledOrders > 0);
 }

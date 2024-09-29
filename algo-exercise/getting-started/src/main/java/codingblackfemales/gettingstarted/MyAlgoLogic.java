@@ -23,12 +23,10 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
     // History of highest bid prices and lowest ask price to analyse trends which are stored in two lists
     private final List<Double> nearTouchBidPricesList = new LinkedList<>();
     private final List<Double> nearTouchAskPricesList = new LinkedList<>();
-    // private final List<Double> farTouchBidPricesList = new LinkedList<>();
-    // private final List<Double> farTouchAskPricesList = new LinkedList<>();
-
-    // List hold the last 3 values of the bid and ask prices
+    
+    // List hold the last 5 values of the bid and ask prices
     // Small window of price history for analysis
-    private static final int maxPriceHistory = 10;
+    private static final int maxPriceHistory = 5;
 
     @Override
     // evaluate - decision making
@@ -42,8 +40,6 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
 
         logger.info("[MYALGOLOGIC] The state of the order book is:\n" + orderBookAsString);
 
-        // var totalOrderCount = state.getChildOrders().size();
-
         // Get highest bid price from order book
         final BidLevel nearTouchBid = state.getBidAt(0);
         long bidQuantity = 100;
@@ -54,40 +50,27 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
         long askQuantity = 100;
         long nearAskPrice = nearTouchAsk.price;
 
-        // // Get lowest bid in the order book
-        // final BidLevel farTouchBid = state.getBidAt(state.getBidLevels() - 1);
-        // long farBidPrice = farTouchBid.price;
-
-        // // Get highest ask in the order book
-        // final AskLevel farTouchAsk = state.getAskAt(state.getAskLevels() -1);
-        // long farAskPrice = farTouchAsk.price;
-
         // Update the near touch bid and ask prices in the lists
         updatePrices(nearTouchBidPricesList, nearBidPrice);
         updatePrices(nearTouchAskPricesList, nearAskPrice);
-        // updatePrices(farTouchBidPricesList, farBidPrice);
-        // updatePrices(farTouchAskPricesList, farAskPrice);
-
+        
         // Determine trend for both bid and ask prices 
         // Call getPrice method on updated price lists
         PriceTrend nearTouchBidTrend = getPrice(nearTouchBidPricesList);
         PriceTrend nearTouchAskTrend = getPrice(nearTouchAskPricesList);
-        // PriceTrend farTouchBidTrend = getPrice(farTouchBidPricesList);
-        // PriceTrend farTouchAskTrend = getPrice(farTouchAskPricesList);
 
         // Logs the trends for the bid and ask prices
         logger.info("[MYALGOLOGIC] Near touch bid price trend is: " + nearTouchBidTrend);
         logger.info("[MYALGOLOGIC] Near touch ask price trend is: " + nearTouchAskTrend);
-        // logger.info("[MYALGOLOGIC] Far touch bid price trend is: " + farTouchBidTrend);
-        // logger.info("[MYALGOLOGIC] Far touch ask price trend is: " + farTouchAskTrend);
 
         // Retrieve list of current active child orders
         final var activeOrders = state.getActiveChildOrders();
 
-        // Cancel if there are 3 active child orders
-        if (activeOrders.size() > 0) {
-            // stream().findFirst - get first active order
-            final var option = activeOrders.stream().findFirst();
+        // Cancel if there are > 0 active child orders
+        if (activeOrders.size() == 5) {
+            // stream().reduce((first, second) -> second) = last element in stream
+            // Cancel last child order
+            final var option = activeOrders.stream().reduce((first, second) -> second);
             // option.isPresent() - order found, logs that it will cancel order and returns the CancelChildOrder action
             if (option.isPresent()) {
                 var childOrder = option.get();
@@ -108,7 +91,7 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
                 // Create buy order if price is trending up
                 logger.info("[MYALGOLOGIC] Bid price in downward trend. Place buy order with: " + bidQuantity + " @ " + nearBidPrice);
                 return new CreateChildOrder(Side.BUY, bidQuantity, nearBidPrice);
-            // Sell when the near or far touch ask price is in upward trend
+            // Sell when the near touch ask price is in upward trend
             } if (nearTouchAskTrend == PriceTrend.UpwardTrend) {
                 // Create sell order if ask price is trending up
                 logger.info("[MYALGOLOGIC] Ask price in upward trend. Placing sell order with: " + askQuantity + " @ " + nearAskPrice);
@@ -119,7 +102,7 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
                 return NoAction;
             }
         } else {
-            // If there are 3 child orders, no action
+            // If there are 5 child orders, no action
             logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders, orders complete.");
             return NoAction;
         }
@@ -134,7 +117,7 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
         priceList.add((double) price);
     }
 
-    // Method to determine if prices are trending up or down
+    // Method to determine if prices are trending up, down or no trend
     private PriceTrend getPrice(List<Double> priceList) {
         if (priceList.size() < 2) {
             return PriceTrend.NoTrend; // Not enough data
@@ -143,7 +126,7 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
         // Retrieve the most recent prices from price list
         // Index of the last element
         Double lastPrice = priceList.get(priceList.size() - 1);
-        // Index od the second to last element 
+        // Index of the second to last element 
         Double previousPrice = priceList.get(priceList.size() - 2);
 
         if (lastPrice > previousPrice) {
@@ -165,151 +148,3 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
     }
 
     }
-
-    // TO DO (20.09.24)
-    // 10 maxPriceHistory - DONE
-    // Check this line - add value to book to fill quantity - DONE (filleQuantity = 100 as found matching order)
-    // Check tick 4 and 5 - DONE
-
-     
-//         // Best bid price for buying
-//         final BidLevel nearTouch = state.getBidAt(0);
-        
-//         long quantity = 100;
-//         long price = nearTouch.price;
-
-//         // Checks total number of child orders that have been created
-//         // If the number is greater than 20, no action taken
-//         // This prevents over-trading by limiting number of active orders
-//          if (totalOrderCount > 20) {
-//             return NoAction;
-//          }
-//         // Retrieves list of active child orders
-//         final var activeOrders = state.getActiveChildOrders();
-            
-//         // for loop to iterates over active orders and checks if prices are higher than order. If so, order is cancelled
-//         for (var order : activeOrders) {
-//             if (order.getPrice() > nearTouch.price) {
-//                 logger.info("[MYALGOLOGIC] Cancelling order at price: " + order.getPrice() + " (nearTouch is: " + nearTouch.price + ")");
-//                 // If order is priced too high, algo cancels
-//                 return new CancelChildOrder(order);
-//             }
-
-//         }
-//         // LOGIC 1 = threshold
-//         // Threshold logic to determine if the price is low
-//         // Passive strategy when price is low
-//         if (price <= buyPriceThreshold && state.getChildOrders().size() < maxBuyOrders) {
-//             logger.info("[MYALGOLOGIC] Price is below or equal to threshold: " + buyPriceThreshold + ". Buying " + quantity + " @ " + price);
-//             logger.info("[MYALGOLOGIC] Profit made based on buy threshold: £" + (buyPriceThreshold - price));
-//             return new CreateChildOrder(Side.BUY, quantity, price);     
-//         } 
-//         // No action if all child orders done
-//         logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders done, wanted " + maxBuyOrders + ", no action needed.");
-//             return NoAction;
-        
-//     }   
-
-// }
-
-    //     // Methods define the price thresholds for when to buy or sell
-    //     // Return values subject to change 
-    // protected double buyPriceThreshold() {
-    //     return 104; // If current market price is less than 104, algo will buy
-    // }
-
-// Average price logic
-//        logger.info("[MYALGOLOGIC] In My Algo Logic...");
-
-//        var orderBookAsString = Util.orderBookToString(state);
-
-//        logger.info("[MYALGOLOGIC] The state of the order book is:\n" + orderBookAsString);
-
-//        var totalOrderCount = state.getActiveChildOrders().size();
-
-//        long quantity = 100;
-
-//        // Prevent over-trading by limiting the number of active orders
-//        if (totalOrderCount > 15) {
-//         return NoAction;
-//        }
-
-//     //    // Retrieves list of active child orders
-//     //    final var activeOrders = state.getActiveChildOrders();
-//     //    // Cancel active orders
-//     //    if (activeOrders.size() > 0) {
-//     //     // Get first active order
-//     //     final var option = activeOrders.stream().findFirst();
-//     //     // Order found, cancel order and return CancelChildOrder action
-//     //     if (option.isPresent()) {
-//     //         var childOrder = option.get();
-//     //         logger.info("[MYALGOLOGIC] Cancelling order: " + childOrder);
-//     //         return new CancelChildOrder(childOrder);
-//     //     }
-    
-//     // }
-
-//        // Cancel orders price above the buyPriceThreshold
-//        for (var childOrder : state.getActiveChildOrders()) {
-//         if (childOrder.getPrice() > buyPriceThreshold) {
-//             logger.info("[MYALGOLOGIC] Cancelling order at price: " + childOrder.getPrice() + ". Buy threshold is: " + buyPriceThreshold);
-//             return new CancelChildOrder(childOrder);
-//         }
-//        }
-
-//        // Calculate the average price of all bids and asks
-//        long averagePrice = calculateAveragePrice(state);
-
-//        // Log the average price
-//        logger.info("[MYALGOLOGIC] Average price is: " + averagePrice);
-
-//        // Place child order if average price is <= to buy threshold
-//        // And if max buy orders have not been reached
-//        if (averagePrice <= buyPriceThreshold && state.getChildOrders().size() < maxBuyOrders) {
-//         logger.info("[MYALGOLOGIC] Average is is below or equal to buy threshold: " + buyPriceThreshold + ". Buying " + quantity + " @ " + averagePrice);
-//         logger.info("[MYALGOLOGIC] Total profit to be made: £" + (buyPriceThreshold - averagePrice));
-//         logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders completed, want " + maxBuyOrders);
-//         return new CreateChildOrder(Side.BUY, quantity, averagePrice);
-//        }
-
-//        logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders completed, wanted " + maxBuyOrders + ", no action required.");
-//        return NoAction;
-
-//     }
-
-//     // Method: calculate the average price of all bid and ask levels
-//     private long calculateAveragePrice(SimpleAlgoState state) {
-//         long priceSum = 0;
-//         int priceCount = 0;
-
-//         // Index for bid and ask levels
-//         int i = 0;
-
-//         // While loop to sum bid prices
-//         // Continue loop while i < total number of bid levels
-//         while (i < state.getBidLevels()) {
-//             BidLevel bid = state.getBidAt(i); // Get bid levels at index i
-//             priceSum += bid.price; // Add bid price to priceSum
-//             priceCount++; // Increment count of prices
-//             i++; // Increment index i for next iteration
-//         }
-
-//         // Reset index to 0 to iterate through ask levels
-//         i = 0;
-
-//         // While loop to sum ask prices
-//         // Continue loop while i < total number of ask levels
-//         while (i < state.getAskLevels()) {
-//             AskLevel ask = state.getAskAt(i); // Get ask level at index i
-//             priceSum += ask.price; // Add ask price to priceSum
-//             priceCount++; // Increment count of prices
-//             i++; // Increment index i for next iteration
-//         }
-
-//         // Return the average price
-//         // True: priceCount == 0 - 0 is returned (when no proces to average)
-//         // False: priceSum / priceCount != 0, expression returned
-//         return (priceCount == 0) ? 0 : priceSum / priceCount;
-//     }
-
-// }
