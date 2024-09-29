@@ -49,3 +49,5 @@ For other commands, see below:
 - Clean all projects: `./mvnw clean`
 - Test all `algo-exercise` projects: `./mvnw test --projects algo-exercise`
 - Compile the `getting-started` project only: `./mvnw compile --projects algo-exercise/getting-started`
+
+# UI Exercise
