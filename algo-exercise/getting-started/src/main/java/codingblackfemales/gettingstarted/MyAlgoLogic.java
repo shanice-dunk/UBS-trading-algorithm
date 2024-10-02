@@ -4,6 +4,8 @@ import codingblackfemales.action.Action;
 import codingblackfemales.action.CancelChildOrder;
 import codingblackfemales.action.CreateChildOrder;
 import codingblackfemales.algo.AlgoLogic;
+import codingblackfemales.orderbook.order.Order;
+import codingblackfemales.sotw.ChildOrder;
 import codingblackfemales.sotw.SimpleAlgoState;
 import codingblackfemales.sotw.marketdata.AskLevel;
 import codingblackfemales.sotw.marketdata.BidLevel;
@@ -15,16 +17,16 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
+public class MyAlgoLogic implements AlgoLogic {
         
     // Logs messages during execution of the algo
     private static final Logger logger = LoggerFactory.getLogger(MyAlgoLogic.class);
 
     // History of highest bid prices and lowest ask price to analyse trends which are stored in two lists (objects)
-    private final List<Double> nearTouchBidPricesList = new LinkedList<>();
-    private final List<Double> nearTouchAskPricesList = new LinkedList<>();
+    private final List<Double> nearTouchBidPricesList = new ArrayList<>();
+    private final List<Double> nearTouchAskPricesList = new ArrayList<>();
     
-    // List hold the last 5 values of the bid and ask prices
+    // List hold the last 10 values of the bid and ask prices
     // Small window of price history for analysis (constant)
     private static final int maxPriceHistory = 10;
 
@@ -54,6 +56,7 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
         long askQuantity = 100;
         long nearAskPrice = nearTouchAsk.price;
 
+
         // Update the near touch bid and ask prices in the lists
         // Methods
         updatePrices(nearTouchBidPricesList, nearBidPrice);
@@ -64,6 +67,7 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
         // Methods
         PriceTrend nearTouchBidTrend = getPrice(nearTouchBidPricesList);
         PriceTrend nearTouchAskTrend = getPrice(nearTouchAskPricesList);
+        
 
         // Logs the trends for the bid and ask prices
         logger.info("[MYALGOLOGIC] Near touch bid price trend is: " + nearTouchBidTrend);
@@ -120,16 +124,19 @@ public class MyAlgoLogic<PriceTrend> implements AlgoLogic {
     }
     // Method maintains a list of most recent prices
     // If list exceeds maxPriceHistory, remove the oldest price and add new one
-    private void updatePrices(List<Double> priceList, long price) {
+    private void updatePrices(List<Double> priceList, double price) {
         if (priceList.size() == maxPriceHistory) {
             priceList.remove(0); // Remove the oldest price (FIFO)
         }
         priceList.add((double) price);
     }
 
+    // Check if price list is null
+
     // Method to determine if prices are trending up, down or no trend
     private PriceTrend getPrice(List<Double> priceList) {
-        if (priceList.size() < 5) {
+        if (priceList.size() < 3) {
+            logger.warn("[Price list is null or not enough data.]");
             return PriceTrend.NoTrend; // Not enough data
         }
 

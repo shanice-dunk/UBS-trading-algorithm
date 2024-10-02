@@ -497,3 +497,143 @@
 //     }
 
 //     }
+
+// // AVERAGE PRICE WITH THRESHOLD AND LIST LOGIC (tests seem to be working)
+// public class MyAlgoLogic implements AlgoLogic {
+        
+//     // Logs messages during execution of the algo
+//     private static final Logger logger = LoggerFactory.getLogger(MyAlgoLogic.class);
+
+//     // History of highest bid prices and lowest ask price to analyse trends which are stored in two lists (objects)
+//     // private final List<Double> nearTouchBidPricesList = new ArrayList<>();
+//     // private final List<Double> nearTouchAskPricesList = new ArrayList<>();
+
+//     // History of average bid and ask prices
+//     private final List<Double> avergaeBidPricesList = new ArrayList<>();
+//     private final List<Double> averageAskPricesList = new ArrayList<>();
+    
+//     // List hold the last 10 values of the bid and ask prices
+//     // Small window of price history for analysis (constant)
+//     private static final int maxPriceHistory = 10;
+
+//     // Thresholds for buy and sell
+//     private static final double buyThreshold = 100;
+//     private static final double sellThreshold = 100;
+
+//     @Override
+//     // evaluate - decision making
+//     // Action - create or cancel orders
+//     public Action evaluate(SimpleAlgoState state) {
+//         // Threshold logic
+//         // Loggers run outputs of the current state of the order book
+//         logger.info("[MYALGOLOGIC] In My Algo Logic....");
+
+//         var orderBookAsString = Util.orderBookToString(state);
+
+//         logger.info("[MYALGOLOGIC] The state of the order book is:\n" + orderBookAsString);
+
+//         // Get highest bid price from order book
+//         // Object
+//         final BidLevel nearTouchBid = state.getBidAt(0);
+//         // Primitive values
+//         long bidQuantity = 100;
+//         // long nearBidPrice = nearTouchBid.price;
+
+//         // Get lowest ask price from order book
+//         // Object
+//         final AskLevel nearTouchAsk = state.getAskAt(0);
+//         // Primitive values
+//         long askQuantity = 100;
+//         // long nearAskPrice = nearTouchAsk.price;
+
+
+//         // Update the near touch bid and ask prices in the lists
+//         // Methods
+//         updatePrices(avergaeBidPricesList, nearTouchBid.price);
+//         updatePrices(averageAskPricesList, nearTouchAsk.price);
+        
+//         // // Determine trend for both bid and ask prices 
+//         // // Call getPrice method on updated price lists
+//         // // Methods
+//         // PriceTrend nearTouchBidTrend = getPrice(nearTouchBidPricesList);
+//         // PriceTrend nearTouchAskTrend = getPrice(nearTouchAskPricesList);
+
+//         // Method to calculate average prices
+//         long averageBidPrice = (long) calculateAverage(avergaeBidPricesList);
+//         long averageAskPrice = (long) calculateAverage(averageAskPricesList);
+
+//         // Log the average prices
+//         logger.info("[MYALGOLOGIC] Average BUY price: " + averageBidPrice);
+//         logger.info("[MYALGOLOGIC] Average SELL price: " + averageAskPrice);
+        
+
+//         // // Logs the trends for the bid and ask prices
+//         // logger.info("[MYALGOLOGIC] Near touch bid price trend is: " + nearTouchBidTrend);
+//         // logger.info("[MYALGOLOGIC] Near touch ask price trend is: " + nearTouchAskTrend);
+
+//         // Retrieve list of current active child orders
+//         final var activeOrders = state.getActiveChildOrders();
+
+//         // // Cancel logic
+//         // if (activeOrders.size() > 3) {
+//         //     // Retrieve the last child order
+//         //     final var lastOrder = activeOrders.get(activeOrders.size() - 1);
+//         //     // Log last order will be cancelled
+//         //     logger.info("[MYALGOLOGIC] Cancelling order: " + lastOrder);
+//         //     return new CancelChildOrder(lastOrder);
+//         // } 
+//         for (var childOrder : activeOrders) {
+//             if (movedPrice(state, childOrder)) {
+//                 logger.info("[MYALGOLOGIC] Cancelling order due to a significant market price movement: " + childOrder);
+//                 return new CancelChildOrder(childOrder);
+//             }
+//         }
+
+//         // Create child order for buy or sell based on average price
+//         if (activeOrders.size() < 5) {
+//             if (averageBidPrice < buyThreshold) {
+//                 logger.info("[MYALGOLOGIC] Average price is below buy threshold. Placing buy order with: " + bidQuantity + " @ " + averageBidPrice);
+//                 return new CreateChildOrder(Side.BUY, bidQuantity, averageBidPrice);
+//             } else if (averageAskPrice > sellThreshold) {
+//                 logger.info("[MYALGOLOGIC] Average price is above sell threshold. Placing sell order with: " + askQuantity + " @ " + averageAskPrice);
+//                 return new CreateChildOrder(Side.SELL, askQuantity, averageAskPrice);
+//             } else {
+//                 // No action if there is no trend
+//                 logger.info("[MYALGOLOGIC] No clear price trend, no action required.");
+//                 return NoAction;
+//                 }
+//           } else {
+//                 // If there are 5 child orders, no action
+//                 logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders, orders complete.");
+//                         return NoAction;
+//                     }
+//         }
+
+//         // Method for market price moving significantly
+//         private boolean movedPrice(SimpleAlgoState state, ChildOrder childOrder) {
+//             double currentMarket = state.getBidAt(0).price;
+//             double orderPrice = childOrder.getPrice();
+//             double priceDifference = Math.abs(currentMarket - orderPrice) / orderPrice;
+
+//             return priceDifference > 0.02; // Cancel if moved more than 2%
+//         }
+
+//         // Method to update price list
+//         private void updatePrices(List<Double> priceList, long price) {
+//             if (priceList.size() == maxPriceHistory) {
+//                 priceList.remove(0); // Remove the oldest price
+//             }
+//             priceList.add((double) price);
+//         }
+
+//         // Method to calculate the average price in list
+//         private double calculateAverage(List<Double> priceList) {
+//             if (priceList.isEmpty()) {
+//                 return 0; // No division by 0
+//             }
+//             double sum = 0;
+//             for (Double price : priceList) {
+//                 sum += price;
+//             }
+//             return sum / priceList.size();
+//         }

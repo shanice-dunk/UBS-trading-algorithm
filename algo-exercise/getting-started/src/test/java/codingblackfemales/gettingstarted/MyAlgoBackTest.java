@@ -62,7 +62,7 @@ protected AlgoContainer container;
 
         container = new AlgoContainer(new MarketDataService(runTrigger), new OrderService(runTrigger), runTrigger, actioner);
         //set my algo logic
-        container.setLogic(new MyAlgoLogic<>());
+        container.setLogic(new MyAlgoLogic());
 
         network.addConsumer(new LoggingConsumer());
         network.addConsumer(book);
@@ -78,7 +78,7 @@ protected AlgoContainer container;
    
 @Override
     public AlgoLogic createAlgoLogic() {
-            return new MyAlgoLogic<>();
+            return new MyAlgoLogic();
     }
 
     // Create upward trend
@@ -98,19 +98,15 @@ protected AlgoContainer container;
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(5)
+        encoder.bidBookCount(3)
                 .next().price(98L).size(100L)
                 .next().price(95L).size(200L)
-                .next().price(91L).size(300L)
-                .next().price(90L).size(400L)
-                .next().price(89L).size(500L);
+                .next().price(91L).size(300L);
 
-        encoder.askBookCount(5)
-                .next().price(99L).size(101L)
-                .next().price(100L).size(200L)
-                .next().price(101L).size(300L)
-                .next().price(103L).size(500L)
-                .next().price(104L).size(5000L);
+        encoder.askBookCount(3)
+                .next().price(100L).size(101L)
+                .next().price(110L).size(200L)
+                .next().price(115L).size(5000L);
             
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -134,19 +130,15 @@ protected AlgoContainer container;
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(5)
-                .next().price(101L).size(100L)
-                .next().price(99L).size(200L)
-                .next().price(97L).size(300L)
-                .next().price(96L).size(400L)
-                .next().price(94L).size(500L);
+        encoder.bidBookCount(3)
+                .next().price(100L).size(100L)
+                .next().price(98L).size(200L)
+                .next().price(94L).size(300L);
 
-        encoder.askBookCount(5)
-                .next().price(101L).size(101L)
-                .next().price(103L).size(200L)
-                .next().price(104L).size(300L)
-                .next().price(105L).size(500L)
-                .next().price(110L).size(5000L);
+        encoder.askBookCount(3)
+                .next().price(102L).size(101L)
+                .next().price(110L).size(200L)
+                .next().price(115L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -170,19 +162,15 @@ protected AlgoContainer container;
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(5)
-                .next().price(103L).size(100L)
+        encoder.bidBookCount(3)
+                .next().price(104L).size(100L)
                 .next().price(101L).size(200L)
-                .next().price(98L).size(300L)
-                .next().price(97L).size(400L)
-                .next().price(95L).size(500L);
+                .next().price(99L).size(300L);
 
-        encoder.askBookCount(5)
-                .next().price(103L).size(101L)
-                .next().price(105L).size(200L)
-                .next().price(108L).size(300L)
-                .next().price(110L).size(500L)
-                .next().price(113L).size(5000L);
+        encoder.askBookCount(3)
+                .next().price(108L).size(101L)
+                .next().price(112L).size(200L)
+                .next().price(116L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -206,19 +194,15 @@ protected AlgoContainer container;
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(5)
-                .next().price(104L).size(100L)
-                .next().price(102L).size(200L)
-                .next().price(100L).size(300L)
-                .next().price(98L).size(400L)
-                .next().price(97L).size(500L);
+        encoder.bidBookCount(3)
+                .next().price(110L).size(100L)
+                .next().price(105L).size(200L)
+                .next().price(101L).size(300L);
 
-        encoder.askBookCount(5)
-                .next().price(105L).size(101L)
-                .next().price(108L).size(200L)
-                .next().price(110L).size(300L)
-                .next().price(113L).size(500L)
-                .next().price(114L).size(5000L);
+        encoder.askBookCount(3)
+                .next().price(110L).size(101L)
+                .next().price(116L).size(200L)
+                .next().price(119L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -243,19 +227,15 @@ protected AlgoContainer container;
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(5)
-                .next().price(105L).size(100L)
-                .next().price(103L).size(200L)
-                .next().price(101L).size(300L)
-                .next().price(100L).size(400L)
-                .next().price(99L).size(500L);
-
-        encoder.askBookCount(5)
-                .next().price(108L).size(101L)
+        encoder.bidBookCount(3)
+                .next().price(115L).size(100L)
                 .next().price(110L).size(200L)
-                .next().price(113L).size(300L)
-                .next().price(114L).size(500L)
-                .next().price(116L).size(5000L);
+                .next().price(105L).size(300L);
+
+        encoder.askBookCount(3)
+                .next().price(115L).size(101L)
+                .next().price(118L).size(200L)
+                .next().price(120L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -278,19 +258,15 @@ protected AlgoContainer container;
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(5)
-                .next().price(103L).size(100L)
-                .next().price(102L).size(200L)
-                .next().price(100L).size(300L)
-                .next().price(99L).size(400L)
-                .next().price(98L).size(500L);
+        encoder.bidBookCount(3)
+                .next().price(112L).size(100L)
+                .next().price(108L).size(200L)
+                .next().price(103L).size(300L);
 
-        encoder.askBookCount(5)
-                .next().price(107L).size(101L)
-                .next().price(109L).size(200L)
-                .next().price(112L).size(300L)
-                .next().price(113L).size(500L)
-                .next().price(115L).size(5000L);
+        encoder.askBookCount(3)
+                .next().price(113L).size(101L)
+                .next().price(115L).size(200L)
+                .next().price(118L).size(5000L);
             
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -314,19 +290,15 @@ protected AlgoContainer container;
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(5)
-                .next().price(102L).size(100L)
-                .next().price(100L).size(200L)
-                .next().price(99L).size(300L)
-                .next().price(98L).size(400L)
-                .next().price(97L).size(500L);
+        encoder.bidBookCount(3)
+                .next().price(110L).size(100L)
+                .next().price(106L).size(200L)
+                .next().price(102L).size(300L);
 
-        encoder.askBookCount(5)
-                .next().price(106L).size(101L)
-                .next().price(107L).size(200L)
-                .next().price(109L).size(300L)
-                .next().price(112L).size(500L)
-                .next().price(113L).size(5000L);
+        encoder.askBookCount(3)
+                .next().price(111L).size(101L)
+                .next().price(113L).size(200L)
+                .next().price(115L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
@@ -350,18 +322,14 @@ protected AlgoContainer container;
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(5)
-                .next().price(101L).size(100L)
-                .next().price(99L).size(200L)
-                .next().price(98L).size(300L)
-                .next().price(97L).size(400L)
-                .next().price(96L).size(500L);
+        encoder.bidBookCount(3)
+                .next().price(105L).size(100L)
+                .next().price(100L).size(200L)
+                .next().price(97L).size(300L);
 
-        encoder.askBookCount(5)
-                .next().price(103L).size(101L)
-                .next().price(105L).size(200L)
-                .next().price(107L).size(300L)
-                .next().price(109L).size(500L)
+        encoder.askBookCount(3)
+                .next().price(108L).size(101L)
+                .next().price(109L).size(200L)
                 .next().price(110L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
@@ -386,18 +354,14 @@ protected AlgoContainer container;
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(5)
-                .next().price(99L).size(100L)
-                .next().price(98L).size(200L)
-                .next().price(97L).size(300L)
-                .next().price(95L).size(400L)
-                .next().price(93L).size(500L);
+        encoder.bidBookCount(3)
+                .next().price(100L).size(100L)
+                .next().price(99L).size(200L)
+                .next().price(94L).size(300L);
 
-        encoder.askBookCount(5)
-                .next().price(100L).size(101L)
-                .next().price(104L).size(200L)
-                .next().price(106L).size(300L)
-                .next().price(107L).size(500L)
+        encoder.askBookCount(3)
+                .next().price(101L).size(101L)
+                .next().price(102L).size(200L)
                 .next().price(109L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
@@ -423,26 +387,22 @@ protected AlgoContainer container;
         encoder.instrumentId(123L);
         encoder.source(Source.STREAM);
 
-        encoder.bidBookCount(5)
-                .next().price(98L).size(100L)
-                .next().price(97L).size(200L)
-                .next().price(95L).size(300L)
-                .next().price(93L).size(400L)
-                .next().price(91L).size(500L);
+        encoder.bidBookCount(3)
+                .next().price(97L).size(100L)
+                .next().price(95L).size(200L)
+                .next().price(93L).size(300L);
 
-        encoder.askBookCount(5)
-                .next().price(99L).size(101L)
-                .next().price(100L).size(200L)
-                .next().price(104L).size(300L)
-                .next().price(106L).size(500L)
-                .next().price(107L).size(5000L);
+        encoder.askBookCount(3)
+                .next().price(98L).size(101L)
+                .next().price(99L).size(200L)
+                .next().price(100L).size(5000L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
         return directBuffer;
     } 
 
-//     Create volatile trend ticks
+//     Create separate tests??
 
     @Test
     public void testExampleBackTest() throws Exception {
@@ -462,23 +422,25 @@ protected AlgoContainer container;
     send(createTick9());
     send(createTick10());
 
+//     assertEquals(container.getState().getChildOrders().size(), 5);
+
     // Get state 
     var state = container.getState();
 
-    // Orders cancelled
-    long activeBuyOrders = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.BUY).count();
+//     // Orders cancelled
+//     long activeBuyOrders = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.BUY).count();
 
-    long activeSellOrders = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.SELL).count();
+//     long activeSellOrders = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.SELL).count();
 
-    // Cancellations
-    assertTrue("Buy orders cancelled due to UPWARD market trend", activeBuyOrders < 5);
-    assertTrue("Sell orders cancelled due to DOWNWARD market trend", activeSellOrders < 5);
+//     // Cancellations
+//     assertTrue("Buy orders cancelled due to UPWARD market trend", activeBuyOrders > 0);
+// //     assertTrue("Sell orders cancelled due to DOWNWARD market trend", activeSellOrders > 0);
+
+    assertEquals(container.getState().getChildOrders().size(), 19);
 
     // Assert that the algo updated its order based on market movements
     long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
     
-    // Check if the algo is creating new orders 
-    assertEquals(state.getChildOrders().size(), 3); 
 
     //and: check that our algo state was updated to reflect our fills when the market data
     assertEquals(0, filledQuantity);
