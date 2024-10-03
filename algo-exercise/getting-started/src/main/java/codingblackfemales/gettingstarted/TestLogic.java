@@ -504,21 +504,17 @@
 //     // Logs messages during execution of the algo
 //     private static final Logger logger = LoggerFactory.getLogger(MyAlgoLogic.class);
 
-//     // History of highest bid prices and lowest ask price to analyse trends which are stored in two lists (objects)
-//     // private final List<Double> nearTouchBidPricesList = new ArrayList<>();
-//     // private final List<Double> nearTouchAskPricesList = new ArrayList<>();
-
 //     // History of average bid and ask prices
-//     private final List<Double> avergaeBidPricesList = new ArrayList<>();
-//     private final List<Double> averageAskPricesList = new ArrayList<>();
+//     private final List<Double> avergaeBidPricesList = new LinkedList<>();
+//     private final List<Double> averageAskPricesList = new LinkedList<>();
     
 //     // List hold the last 10 values of the bid and ask prices
 //     // Small window of price history for analysis (constant)
 //     private static final int maxPriceHistory = 10;
 
 //     // Thresholds for buy and sell
-//     private static final double buyThreshold = 100;
-//     private static final double sellThreshold = 100;
+//     private static final double buyThreshold = 95;
+//     private static final double sellThreshold = 98;
 
 //     @Override
 //     // evaluate - decision making
@@ -536,27 +532,22 @@
 //         // Object
 //         final BidLevel nearTouchBid = state.getBidAt(0);
 //         // Primitive values
-//         long bidQuantity = 100;
-//         // long nearBidPrice = nearTouchBid.price;
+//         long bidQuantity = 80;
+//         long nearBidPrice = nearTouchBid.price;
 
 //         // Get lowest ask price from order book
 //         // Object
 //         final AskLevel nearTouchAsk = state.getAskAt(0);
 //         // Primitive values
 //         long askQuantity = 100;
-//         // long nearAskPrice = nearTouchAsk.price;
+//         long nearAskPrice = nearTouchAsk.price;
 
 
 //         // Update the near touch bid and ask prices in the lists
 //         // Methods
 //         updatePrices(avergaeBidPricesList, nearTouchBid.price);
 //         updatePrices(averageAskPricesList, nearTouchAsk.price);
-        
-//         // // Determine trend for both bid and ask prices 
-//         // // Call getPrice method on updated price lists
-//         // // Methods
-//         // PriceTrend nearTouchBidTrend = getPrice(nearTouchBidPricesList);
-//         // PriceTrend nearTouchAskTrend = getPrice(nearTouchAskPricesList);
+    
 
 //         // Method to calculate average prices
 //         long averageBidPrice = (long) calculateAverage(avergaeBidPricesList);
@@ -565,25 +556,13 @@
 //         // Log the average prices
 //         logger.info("[MYALGOLOGIC] Average BUY price: " + averageBidPrice);
 //         logger.info("[MYALGOLOGIC] Average SELL price: " + averageAskPrice);
-        
-
-//         // // Logs the trends for the bid and ask prices
-//         // logger.info("[MYALGOLOGIC] Near touch bid price trend is: " + nearTouchBidTrend);
-//         // logger.info("[MYALGOLOGIC] Near touch ask price trend is: " + nearTouchAskTrend);
 
 //         // Retrieve list of current active child orders
 //         final var activeOrders = state.getActiveChildOrders();
 
-//         // // Cancel logic
-//         // if (activeOrders.size() > 3) {
-//         //     // Retrieve the last child order
-//         //     final var lastOrder = activeOrders.get(activeOrders.size() - 1);
-//         //     // Log last order will be cancelled
-//         //     logger.info("[MYALGOLOGIC] Cancelling order: " + lastOrder);
-//         //     return new CancelChildOrder(lastOrder);
-//         // } 
+//         // Cancel order if movedPrice is > 2% (method below)
 //         for (var childOrder : activeOrders) {
-//             if (movedPrice(state, childOrder)) {
+//             if (movedPrice(state, childOrder) && activeOrders.size() > 5) {
 //                 logger.info("[MYALGOLOGIC] Cancelling order due to a significant market price movement: " + childOrder);
 //                 return new CancelChildOrder(childOrder);
 //             }
@@ -592,11 +571,11 @@
 //         // Create child order for buy or sell based on average price
 //         if (activeOrders.size() < 5) {
 //             if (averageBidPrice < buyThreshold) {
-//                 logger.info("[MYALGOLOGIC] Average price is below buy threshold. Placing buy order with: " + bidQuantity + " @ " + averageBidPrice);
-//                 return new CreateChildOrder(Side.BUY, bidQuantity, averageBidPrice);
+//                 logger.info("[MYALGOLOGIC] Average price is below buy threshold. Placing buy order with: " + bidQuantity + " @ " + nearBidPrice);
+//                 return new CreateChildOrder(Side.BUY, bidQuantity, nearBidPrice);
 //             } else if (averageAskPrice > sellThreshold) {
-//                 logger.info("[MYALGOLOGIC] Average price is above sell threshold. Placing sell order with: " + askQuantity + " @ " + averageAskPrice);
-//                 return new CreateChildOrder(Side.SELL, askQuantity, averageAskPrice);
+//                 logger.info("[MYALGOLOGIC] Average price is above sell threshold. Placing sell order with: " + askQuantity + " @ " + nearAskPrice);
+//                 return new CreateChildOrder(Side.SELL, askQuantity, nearAskPrice);
 //             } else {
 //                 // No action if there is no trend
 //                 logger.info("[MYALGOLOGIC] No clear price trend, no action required.");
@@ -620,6 +599,7 @@
 
 //         // Method to update price list
 //         private void updatePrices(List<Double> priceList, long price) {
+
 //             if (priceList.size() == maxPriceHistory) {
 //                 priceList.remove(0); // Remove the oldest price
 //             }
@@ -637,3 +617,5 @@
 //             }
 //             return sum / priceList.size();
 //         }
+
+// }

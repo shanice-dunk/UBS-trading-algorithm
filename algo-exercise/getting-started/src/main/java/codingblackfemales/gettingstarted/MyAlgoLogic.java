@@ -4,8 +4,6 @@ import codingblackfemales.action.Action;
 import codingblackfemales.action.CancelChildOrder;
 import codingblackfemales.action.CreateChildOrder;
 import codingblackfemales.algo.AlgoLogic;
-import codingblackfemales.orderbook.order.Order;
-import codingblackfemales.sotw.ChildOrder;
 import codingblackfemales.sotw.SimpleAlgoState;
 import codingblackfemales.sotw.marketdata.AskLevel;
 import codingblackfemales.sotw.marketdata.BidLevel;
@@ -17,14 +15,17 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+
+// TREND ALGO LOGIC (tests seem to be working)
 public class MyAlgoLogic implements AlgoLogic {
         
     // Logs messages during execution of the algo
     private static final Logger logger = LoggerFactory.getLogger(MyAlgoLogic.class);
 
     // History of highest bid prices and lowest ask price to analyse trends which are stored in two lists (objects)
-    private final List<Double> nearTouchBidPricesList = new ArrayList<>();
-    private final List<Double> nearTouchAskPricesList = new ArrayList<>();
+    private final List<Double> nearTouchBidPricesList = new LinkedList<>();
+    private final List<Double> nearTouchAskPricesList = new LinkedList<>();
     
     // List hold the last 10 values of the bid and ask prices
     // Small window of price history for analysis (constant)
@@ -76,14 +77,6 @@ public class MyAlgoLogic implements AlgoLogic {
         // Retrieve list of current active child orders
         final var activeOrders = state.getActiveChildOrders();
 
-        // if (activeOrders.size() > 4) {
-        //     // Retrieve the last child order
-        //     final var lastOrder = activeOrders.get(activeOrders.size() - 1);
-        //     // Log last order will be cancelled
-        //     logger.info("[MYALGOLOGIC] Cancelling order: " + lastOrder);
-        //     return new CancelChildOrder(lastOrder);
-        // } 
-
         // Cancel active orders based on trend
         for (var childOrder : activeOrders) {
             // Cancel BUY order if market trend = UPWARD
@@ -100,15 +93,15 @@ public class MyAlgoLogic implements AlgoLogic {
         // If less than 5 child orders, create new order based on trend
         if (state.getChildOrders().size() < 5) {
             // Decide to buy or sell based on trends
-            // Buy when near touch bid is downward trend 
+            // Buy when price is reversing from downward to upward 
             if (nearTouchBidTrend == PriceTrend.DownwardTrend) {
                 // Create buy order if price is trending up
-                logger.info("[MYALGOLOGIC] Bid price in downward trend. Place buy order with: " + bidQuantity + " @ " + nearBidPrice);
+                logger.info("[MYALGOLOGIC] Market currently in DOWNWARD trend. Place buy order with: " + bidQuantity + " @ " + nearBidPrice);
                 return new CreateChildOrder(Side.BUY, bidQuantity, nearBidPrice);
             // Sell when the near touch ask price is in upward trend
             } if (nearTouchAskTrend == PriceTrend.UpwardTrend) {
                 // Create sell order if ask price is trending up
-                logger.info("[MYALGOLOGIC] Ask price in upward trend. Placing sell order with: " + askQuantity + " @ " + nearAskPrice);
+                logger.info("[MYALGOLOGIC] Market currently in UPWARD trend. Placing sell order with: " + askQuantity + " @ " + nearAskPrice);
                 return new CreateChildOrder(Side.SELL, askQuantity, nearAskPrice);
             } else {
                 // No action if there is no trend
@@ -134,9 +127,15 @@ public class MyAlgoLogic implements AlgoLogic {
     // Check if price list is null
 
     // Method to determine if prices are trending up, down or no trend
+    // Add null check to make sure price list is being updated
     private PriceTrend getPrice(List<Double> priceList) {
-        if (priceList.size() < 3) {
-            logger.warn("[Price list is null or not enough data.]");
+        if (priceList == null) {
+            logger.error("[MYALGOLOGIC] Price list is null.");
+            return null;
+        }
+
+        if (priceList.size() < 4) {
+            logger.warn("[Not enough data in the price list.]");
             return PriceTrend.NoTrend; // Not enough data
         }
 
@@ -144,12 +143,14 @@ public class MyAlgoLogic implements AlgoLogic {
         // Index of the last element
         Double lastPrice = priceList.get(priceList.size() - 1);
         // Index of the second to last element 
-        Double previousPrice = priceList.get(priceList.size() - 2);
+        Double secondLastPrice = priceList.get(priceList.size() - 2);
+        // Index of third to last price
+        Double thirdLastPrice = priceList.get(priceList.size() - 3);
 
-        if (lastPrice > previousPrice) {
+        if (lastPrice > secondLastPrice && thirdLastPrice < secondLastPrice) {
             // Returns UpwardTrend if latest price is higher
             return PriceTrend.UpwardTrend;
-        } else if (lastPrice < previousPrice) {
+        } else if (lastPrice < secondLastPrice && thirdLastPrice > secondLastPrice) {
             // Returns DownwardTrend of latest price is lower
             return PriceTrend.DownwardTrend;
         } else {
@@ -157,6 +158,28 @@ public class MyAlgoLogic implements AlgoLogic {
             return PriceTrend.NoTrend;
         }
     }
+
+    // // Method to determine if trend is reversing 
+    // private boolean trendReversing(List<Double> priceList, PriceTrend currentTrend) {
+    //     if (priceList == null || priceList.size() < 3) {
+    //         return false; // Not enough data
+    //     }
+
+    //     Double lastPrice = priceList.get(priceList.size() - 1);
+    //     Double secondLastPrice = priceList.get(priceList.size() - 2);
+    //     Double thirdLastPrice = priceList.get(priceList.size() - 3);
+
+    //     // Check for upward to downward
+    //     if (currentTrend == PriceTrend.UpwardTrend && secondLastPrice > thirdLastPrice && lastPrice < secondLastPrice) {
+    //         return true; // Price is now failling
+    //     }
+
+    //     // Check for downward to upward
+    //     if (currentTrend == PriceTrend.DownwardTrend && secondLastPrice < thirdLastPrice && lastPrice > secondLastPrice) {
+    //         return true; // Price is now rising
+    //     }
+    //     return false;
+    // }
 
     // Define enum for trends UpwardTrend, DownwardTrend and NoTrend
     // enum = enumeration, represents fixed set of named constants 
