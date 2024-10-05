@@ -41,8 +41,7 @@ export const MarketDepthPanel = ({ data }: MarketDepthPanelProps) => {
                             <td>{row.level}</td>
                             <QuantityCell
                                 quantity={row.bidQuantity}
-                                previousQuantity={previousRow ? previousRow.bidQuantity : null}
-                            />
+                                previousQuantity={previousRow ? previousRow.bidQuantity : null} type={"bid"}                            />
                             <PriceCell
                                 price={row.bid}
                                 previousPrice={previousRow ? previousRow.bid : null}
@@ -53,8 +52,7 @@ export const MarketDepthPanel = ({ data }: MarketDepthPanelProps) => {
                             />
                             <QuantityCell
                                 quantity={row.offerQuantity}
-                                previousQuantity={previousRow ? previousRow.offerQuantity : null}
-                            />
+                                previousQuantity={previousRow ? previousRow.offerQuantity : null} type={"ask"}                            />
                         </tr>
                     );
                 })}

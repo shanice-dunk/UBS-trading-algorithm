@@ -16,8 +16,16 @@ export const PriceCell = ({price, previousPrice} : PriceCellProps) => {
         return "➖"; // No change
     };
 
+    // Colour changes based on price increase or decrease
+    const getPriceChange = () => {
+        if (previousPrice === null) return ''; // No class for first render
+        if (price > previousPrice) return 'priceIncrease'; // Green 
+        if (price < previousPrice) return 'priceDecrease'; // Red
+        return ''; // No change
+    }
+
     return (
-        <td>
+        <td className={getPriceChange()}>
             {price} <span className="arrow">{getPriceArrow()}</span>
         </td>
     );
