@@ -47,7 +47,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
     // Number of child orders created depending on market trend
     assertEquals(container.getState().getChildOrders().size(), 3);
-    
+
     //then: get the state
     var state = container.getState();
     

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 
 
-// TREND ALGO LOGIC (tests seem to be working)
+// TREND ALGO LOGIC (tests are working)
 public class MyAlgoLogic implements AlgoLogic {
         
     // Logs messages during execution of the algo
