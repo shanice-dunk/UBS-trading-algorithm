@@ -44,7 +44,12 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     send(createTick8());
     send(createTick9());
     send(createTick10());
-
+    send(createTick11());
+    send(createTick12());
+    send(createTick13());
+    send(createTick14());
+    send(createTick15());
+ 
     // Number of child orders created depending on market trend
     assertEquals(container.getState().getChildOrders().size(), 3);
 

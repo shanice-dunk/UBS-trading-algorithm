@@ -31,6 +31,11 @@ public class MyAlgoLogic implements AlgoLogic {
     // Small window of price history for analysis (constant)
     private static final int maxPriceHistory = 10;
 
+    // // Variable to store last buy and sell prices
+    // // Initialise both at -1 to indiact no buy or sell has been made
+    // private double lastBuyPrice = -1;
+    // private double lastSellPrice = -1;
+
     @Override
     // evaluate - decision making
     // Action - create or cancel orders
@@ -77,6 +82,7 @@ public class MyAlgoLogic implements AlgoLogic {
         // Retrieve list of current active child orders
         final var activeOrders = state.getActiveChildOrders();
 
+
         // Cancel active orders based on trend
         for (var childOrder : activeOrders) {
             // Cancel BUY order if market trend = UPWARD
@@ -92,16 +98,23 @@ public class MyAlgoLogic implements AlgoLogic {
 
         // If less than 5 child orders, create new order based on trend
         if (state.getChildOrders().size() < 5) {
-            // Decide to buy or sell based on trends
-            // Buy when price is reversing from downward to upward 
+            // // Decide to buy or sell based on trends
             if (nearTouchBidTrend == PriceTrend.DownwardTrend) {
                 // Create buy order if price is trending up
                 logger.info("[MYALGOLOGIC] Market currently in DOWNWARD trend. Place buy order with: " + bidQuantity + " @ " + nearBidPrice);
+                // // Update last buy price
+                // lastBuyPrice = nearBidPrice;
+                // Create child order
                 return new CreateChildOrder(Side.BUY, bidQuantity, nearBidPrice);
-            // Sell when the near touch ask price is in upward trend
+                // Sell when the near touch ask price is in upward trend
             } if (nearTouchAskTrend == PriceTrend.UpwardTrend) {
                 // Create sell order if ask price is trending up
                 logger.info("[MYALGOLOGIC] Market currently in UPWARD trend. Placing sell order with: " + askQuantity + " @ " + nearAskPrice);
+                // // Update last sell price
+                // lastSellPrice = nearAskPrice;
+                // // Check if there has been a profit
+                // checkProfit();
+                // // Create child order
                 return new CreateChildOrder(Side.SELL, askQuantity, nearAskPrice);
             } else {
                 // No action if there is no trend
@@ -158,6 +171,17 @@ public class MyAlgoLogic implements AlgoLogic {
             return PriceTrend.NoTrend;
         }
     }
+
+    // // Method to check if a profit was made
+    // private void checkProfit() {
+    //     if (lastBuyPrice > 0 && lastSellPrice > 0) {
+    //         if (lastSellPrice > lastBuyPrice) {
+    //             logger.info("[MYALGOLOGIC] Potential profit made. Bid placed at " + lastBuyPrice + " and ask placed at " + lastSellPrice);
+    //         } else {
+    //             logger.info("[MYALGOLOGIC] No profit has been made. Bid placed at " + lastBuyPrice + " and ask placed at " + lastSellPrice);
+    //         }
+    //     }
+    // }
 
     // // Method to determine if trend is reversing 
     // private boolean trendReversing(List<Double> priceList, PriceTrend currentTrend) {

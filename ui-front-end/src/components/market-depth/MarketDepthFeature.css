@@ -48,10 +48,15 @@ thead {
 
 .bid-quantity {
   text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  
 }
 
 .ask-quantity {
   text-align: left;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .quantity-bar {
@@ -76,28 +81,28 @@ thead {
 }
 
 .increase {
-  animation: moveRight 0.5s forwards;
+  animation: moveRight 0.5s ease-in-out;
 }
 
 .decrease {
-  animation: moveLeft 0.5s forwards;
+  animation: moveLeft 0.5s ease-in-out;
 }
 
-@keyframes moveRight {
+@keyframes grow {
   from {
     transform: translateX(0%);
   }
   to {
-    transform: translateX(5%);
+    transform: translateX(100%);
   }
 }
 
 
-@keyframes moveLeft {
+@keyframes shrink {
   from {
-    transform: translateX(0%);
+    transform: translateX(100%);
   }
   to {
-    transform: translateX(-5%);
+    transform: translateX(0%);
   }
 }
