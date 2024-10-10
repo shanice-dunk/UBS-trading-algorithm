@@ -29,7 +29,7 @@ public class MyAlgoLogic implements AlgoLogic {
     
     // List hold the last 10 values of the bid and ask prices
     // Small window of price history for analysis (constant)
-    private static final int maxPriceHistory = 10;
+    private static final int maxPriceHistory = 5;
 
     // // Variable to store last buy and sell prices
     // // Initialise both at -1 to indiact no buy or sell has been made
@@ -65,8 +65,8 @@ public class MyAlgoLogic implements AlgoLogic {
 
         // Update the near touch bid and ask prices in the lists
         // Methods
-        updatePrices(nearTouchBidPricesList, nearBidPrice);
-        updatePrices(nearTouchAskPricesList, nearAskPrice);
+        updateBidPrices(nearTouchBidPricesList, nearBidPrice);
+        updateAskPrices(nearTouchAskPricesList, nearAskPrice);
         
         // Determine trend for both bid and ask prices 
         // Call getPrice method on updated price lists
@@ -81,7 +81,6 @@ public class MyAlgoLogic implements AlgoLogic {
 
         // Retrieve list of current active child orders
         final var activeOrders = state.getActiveChildOrders();
-
 
         // Cancel active orders based on trend
         for (var childOrder : activeOrders) {
@@ -130,80 +129,62 @@ public class MyAlgoLogic implements AlgoLogic {
     }
     // Method maintains a list of most recent prices
     // If list exceeds maxPriceHistory, remove the oldest price and add new one
-    private void updatePrices(List<Double> priceList, double price) {
+    private void updateBidPrices(List<Double> priceList, double price) {
         if (priceList.size() == maxPriceHistory) {
             priceList.remove(0); // Remove the oldest price (FIFO)
         }
         priceList.add((double) price);
+
+        // Log current price in list
+        logger.info("[MYALGOLOGIC] Current BUY price list: " + nearTouchBidPricesList.toString());
     }
 
-    // Check if price list is null
+    private void updateAskPrices(List<Double> priceList, double price) {
+        if (priceList.size() == maxPriceHistory) {
+            priceList.remove(0); // Remove the oldest price (FIFO)
+        }
+        priceList.add((double) price);
 
-    // Method to determine if prices are trending up, down or no trend
-    // Add null check to make sure price list is being updated
+        // Log current price in list
+        logger.info("[MYALGOLOGIC] Current SELL price list: " + nearTouchAskPricesList.toString());
+    }
+
+    // Method for percentage trend
     private PriceTrend getPrice(List<Double> priceList) {
         if (priceList == null) {
             logger.error("[MYALGOLOGIC] Price list is null.");
             return null;
         }
 
-        if (priceList.size() < 4) {
-            logger.warn("[Not enough data in the price list.]");
-            return PriceTrend.NoTrend; // Not enough data
-        }
-
-        // Retrieve the most recent prices from price list
-        // Index of the last element
-        Double lastPrice = priceList.get(priceList.size() - 1);
-        // Index of the second to last element 
-        Double secondLastPrice = priceList.get(priceList.size() - 2);
-        // Index of third to last price
-        Double thirdLastPrice = priceList.get(priceList.size() - 3);
-
-        if (lastPrice > secondLastPrice && thirdLastPrice < secondLastPrice) {
-            // Returns UpwardTrend if latest price is higher
-            return PriceTrend.UpwardTrend;
-        } else if (lastPrice < secondLastPrice && thirdLastPrice > secondLastPrice) {
-            // Returns DownwardTrend of latest price is lower
-            return PriceTrend.DownwardTrend;
-        } else {
-            // Returns NoTrend if price is unchanged or not enough data
+        // Ensure at least X prices to analyse trend
+        if (priceList.size() < 3) {
+            logger.warn("[MYALGOLOGIC] Not enough data to determine a price trend.");
             return PriceTrend.NoTrend;
         }
+
+        // Threshold for percentage change
+        final double percentageThreshold = 2.0;
+
+        // Get oldest price and most recent price
+        Double firstPrice = priceList.get(priceList.size() - 2); // Oldest
+        Double lastPrice = priceList.get(priceList.size() - 1); // most recent
+
+        // % change calculation
+        double percentageChange = ((lastPrice - firstPrice) / firstPrice * 100);
+        // Log % change at 2 decimal places
+        logger.info("[MYALGOLOGIC] Percentage change from " + firstPrice + " to " + lastPrice + " is: " + String.format("%.2f", percentageChange) + "%");
+
+        // Check if % change results in upward trend
+        if (percentageChange >= percentageThreshold) {
+            return PriceTrend.UpwardTrend;
+        } // Check if % change results in downward trend
+        // Negative % for downward trend
+        else if (percentageChange <= -percentageThreshold) {
+            return PriceTrend.DownwardTrend;
+        } else {
+            return PriceTrend.NoTrend; // No significant trend
+        }
     }
-
-    // // Method to check if a profit was made
-    // private void checkProfit() {
-    //     if (lastBuyPrice > 0 && lastSellPrice > 0) {
-    //         if (lastSellPrice > lastBuyPrice) {
-    //             logger.info("[MYALGOLOGIC] Potential profit made. Bid placed at " + lastBuyPrice + " and ask placed at " + lastSellPrice);
-    //         } else {
-    //             logger.info("[MYALGOLOGIC] No profit has been made. Bid placed at " + lastBuyPrice + " and ask placed at " + lastSellPrice);
-    //         }
-    //     }
-    // }
-
-    // // Method to determine if trend is reversing 
-    // private boolean trendReversing(List<Double> priceList, PriceTrend currentTrend) {
-    //     if (priceList == null || priceList.size() < 3) {
-    //         return false; // Not enough data
-    //     }
-
-    //     Double lastPrice = priceList.get(priceList.size() - 1);
-    //     Double secondLastPrice = priceList.get(priceList.size() - 2);
-    //     Double thirdLastPrice = priceList.get(priceList.size() - 3);
-
-    //     // Check for upward to downward
-    //     if (currentTrend == PriceTrend.UpwardTrend && secondLastPrice > thirdLastPrice && lastPrice < secondLastPrice) {
-    //         return true; // Price is now failling
-    //     }
-
-    //     // Check for downward to upward
-    //     if (currentTrend == PriceTrend.DownwardTrend && secondLastPrice < thirdLastPrice && lastPrice > secondLastPrice) {
-    //         return true; // Price is now rising
-    //     }
-    //     return false;
-    // }
 
     // Define enum for trends UpwardTrend, DownwardTrend and NoTrend
     // enum = enumeration, represents fixed set of named constants 
@@ -211,4 +192,4 @@ public class MyAlgoLogic implements AlgoLogic {
         UpwardTrend, DownwardTrend, NoTrend;
     }
 
-    }
+}
