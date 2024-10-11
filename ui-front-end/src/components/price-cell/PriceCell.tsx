@@ -1,7 +1,8 @@
 // import { ReactNode, useEffect, useState } from "react";
 // import { MarketDepthRow } from "./useMarketDepthData";
 // import { MarketDepthPanel } from "./MarketDepthPanel";
-import './MarketDepthFeature.css'
+import "../market-depth/MarketDepthCSS.css";
+
 interface PriceCellProps {
     price: number; // The current price
     previousPrice: number | null; // Previous price to compare with

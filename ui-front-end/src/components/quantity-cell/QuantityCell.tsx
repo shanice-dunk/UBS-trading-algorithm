@@ -1,5 +1,6 @@
 // import { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import "../market-depth/MarketDepthCSS.css";
 
 // import { MarketDepthRow } from "./useMarketDepthData";
 

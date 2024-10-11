@@ -39,11 +39,11 @@ thead {
 }
 
 .arrowUp {
-  color: black;
+  color: green;
 }
 
 .arrowDown {
-  color: black;
+  color: red;
 }
 
 .bid-quantity {

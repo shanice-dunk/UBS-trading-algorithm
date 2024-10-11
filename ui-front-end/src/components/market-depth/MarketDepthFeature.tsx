@@ -3,7 +3,7 @@ import { useMarketDepthData } from "./useMarketDepthData";
 import { schemas } from "../../data/algo-schemas";
 import { MarketDepthPanel } from "./MarketDepthPanel";
 // import { MarketDepthRow } from "./useMarketDepthData";
-import './MarketDepthFeature.css'
+import './MarketDepthCSS.css'
 
 // prettier-ignore
 // const data: MarketDepthRow[] = [

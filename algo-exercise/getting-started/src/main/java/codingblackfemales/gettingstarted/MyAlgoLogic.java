@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 
 
-// TREND ALGO LOGIC (tests are working)
+// TREND ALGO LOGIC WITH % (tests are working)
 public class MyAlgoLogic implements AlgoLogic {
         
     // Logs messages during execution of the algo
@@ -30,11 +30,6 @@ public class MyAlgoLogic implements AlgoLogic {
     // List hold the last 10 values of the bid and ask prices
     // Small window of price history for analysis (constant)
     private static final int maxPriceHistory = 5;
-
-    // // Variable to store last buy and sell prices
-    // // Initialise both at -1 to indiact no buy or sell has been made
-    // private double lastBuyPrice = -1;
-    // private double lastSellPrice = -1;
 
     @Override
     // evaluate - decision making
@@ -101,18 +96,12 @@ public class MyAlgoLogic implements AlgoLogic {
             if (nearTouchBidTrend == PriceTrend.DownwardTrend) {
                 // Create buy order if price is trending up
                 logger.info("[MYALGOLOGIC] Market currently in DOWNWARD trend. Place buy order with: " + bidQuantity + " @ " + nearBidPrice);
-                // // Update last buy price
-                // lastBuyPrice = nearBidPrice;
                 // Create child order
                 return new CreateChildOrder(Side.BUY, bidQuantity, nearBidPrice);
                 // Sell when the near touch ask price is in upward trend
             } if (nearTouchAskTrend == PriceTrend.UpwardTrend) {
                 // Create sell order if ask price is trending up
                 logger.info("[MYALGOLOGIC] Market currently in UPWARD trend. Placing sell order with: " + askQuantity + " @ " + nearAskPrice);
-                // // Update last sell price
-                // lastSellPrice = nearAskPrice;
-                // // Check if there has been a profit
-                // checkProfit();
                 // // Create child order
                 return new CreateChildOrder(Side.SELL, askQuantity, nearAskPrice);
             } else {
@@ -130,23 +119,28 @@ public class MyAlgoLogic implements AlgoLogic {
     // Method maintains a list of most recent prices
     // If list exceeds maxPriceHistory, remove the oldest price and add new one
     private void updateBidPrices(List<Double> priceList, double price) {
-        if (priceList.size() == maxPriceHistory) {
-            priceList.remove(0); // Remove the oldest price (FIFO)
+        if (priceList.isEmpty() || priceList.get(priceList.size() - 1) !=price) {
+            if (priceList.size() == maxPriceHistory) {
+                priceList.remove(0); // Remove the oldest price (FIFO)
+            }
+            priceList.add((double) price);
+    
+            // Log current price in list
+            logger.info("[MYALGOLOGIC] Current BUY price list: " + nearTouchBidPricesList.toString());
         }
-        priceList.add((double) price);
 
-        // Log current price in list
-        logger.info("[MYALGOLOGIC] Current BUY price list: " + nearTouchBidPricesList.toString());
     }
 
     private void updateAskPrices(List<Double> priceList, double price) {
-        if (priceList.size() == maxPriceHistory) {
-            priceList.remove(0); // Remove the oldest price (FIFO)
+        if (priceList.isEmpty() || priceList.get(priceList.size() - 1) !=price) {
+            if (priceList.size() == maxPriceHistory) {
+                priceList.remove(0); // Remove the oldest price (FIFO)
+            }
+            priceList.add((double) price);
+    
+            // Log current price in list
+            logger.info("[MYALGOLOGIC] Current SELL price list: " + nearTouchAskPricesList.toString());
         }
-        priceList.add((double) price);
-
-        // Log current price in list
-        logger.info("[MYALGOLOGIC] Current SELL price list: " + nearTouchAskPricesList.toString());
     }
 
     // Method for percentage trend
@@ -156,18 +150,19 @@ public class MyAlgoLogic implements AlgoLogic {
             return null;
         }
 
-        // Ensure at least X prices to analyse trend
+        // Ensure at least 3 prices to analyse trend
         if (priceList.size() < 3) {
             logger.warn("[MYALGOLOGIC] Not enough data to determine a price trend.");
             return PriceTrend.NoTrend;
         }
 
         // Threshold for percentage change
+        // Explain fixed %
         final double percentageThreshold = 2.0;
 
-        // Get oldest price and most recent price
-        Double firstPrice = priceList.get(priceList.size() - 2); // Oldest
-        Double lastPrice = priceList.get(priceList.size() - 1); // most recent
+        // Get 3rd and 5th price
+        Double firstPrice = priceList.get(priceList.size() - 3); 
+        Double lastPrice = priceList.get(priceList.size() - 1); 
 
         // % change calculation
         double percentageChange = ((lastPrice - firstPrice) / firstPrice * 100);

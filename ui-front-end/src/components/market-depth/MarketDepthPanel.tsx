@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { MarketDepthRow } from "./useMarketDepthData";
-import { PriceCell } from "./PriceCell";
-import { QuantityCell } from "./QuantityCell";
+import { PriceCell } from "../price-cell/PriceCell";
+import { QuantityCell } from "../quantity-cell/QuantityCell";
 
 interface MarketDepthPanelProps {
     data: MarketDepthRow[];

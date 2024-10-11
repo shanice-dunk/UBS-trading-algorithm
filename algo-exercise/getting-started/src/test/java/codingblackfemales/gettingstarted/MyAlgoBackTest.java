@@ -2,6 +2,8 @@ package codingblackfemales.gettingstarted;
 
 import codingblackfemales.algo.AlgoLogic;
 import codingblackfemales.sotw.ChildOrder;
+import messages.order.Side;
+
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -55,12 +57,27 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
     //then: get the state
     var state = container.getState();
+
+    // Check filled quantity for BUY
+    long buyFilledQuantity = state.getChildOrders().stream().filter(order -> order.getSide() == Side.BUY).map(ChildOrder::getFilledQuantity).reduce(Long::sum).orElse(0l); // Handles when no buy orders exists
+
+    // Check filled quantity for SELL
+    long sellFilledQuantity = state.getChildOrders().stream().filter(order -> order.getSide() == Side.SELL).map(ChildOrder::getFilledQuantity).reduce(Long::sum).orElse(0l); // Handles when no sell orders exists
     
-    //Check things like filled quantity, cancelled order count etc....
-    long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
+    // Print out filled quantities
+    System.out.println("[MYALGOTEST] Filled quantity for BUY orders: " + buyFilledQuantity);
+    System.out.println("[MYALGOTEST] Filled quantity for SELL orders: " + sellFilledQuantity);
+
+    // Updated filled quantity
+    assertEquals(200, buyFilledQuantity);
+    assertEquals(0, sellFilledQuantity);
+
     
-    //and: check that our algo state was updated to reflect our fills when the market data
-    assertEquals(100, filledQuantity);
+    // //Check things like filled quantity, cancelled order count etc....
+    // long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
+    
+    // //and: check that our algo state was updated to reflect our fills when the market data
+    // assertEquals(200, filledQuantity);
     }
 
 }
