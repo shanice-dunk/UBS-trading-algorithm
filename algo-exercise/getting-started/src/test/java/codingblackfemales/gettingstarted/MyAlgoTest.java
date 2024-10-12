@@ -29,12 +29,12 @@ public class MyAlgoTest extends AbstractAlgoTest {
 
         //create a sample market data tick....
         send(createTick());
+        send(createTick2());
 
-        // No orders created as not enough data after first tick
+        // No orders created as not enough data after first 2 ticks
         assertEquals(container.getState().getChildOrders().size(), 0);
 
         // Market changes
-        send(createTick2());
         send(createTick3());
         send(createTick4());
         send(createTick5());
@@ -43,11 +43,6 @@ public class MyAlgoTest extends AbstractAlgoTest {
         send(createTick8());
         send(createTick9());
         send(createTick10());
-        // send(createTick11());
-        // send(createTick12());
-        // send(createTick13());
-        // send(createTick14());
-        // send(createTick15());
 
         // Number of child orders created depending on market trend
         assertEquals(container.getState().getChildOrders().size(), 5);

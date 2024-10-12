@@ -9,7 +9,6 @@ import codingblackfemales.sotw.marketdata.AskLevel;
 import codingblackfemales.sotw.marketdata.BidLevel;
 import codingblackfemales.util.Util;
 import messages.order.Side;
-
 import static codingblackfemales.action.NoAction.NoAction;
 import java.util.*;
 import org.slf4j.Logger;
@@ -80,12 +79,12 @@ public class MyAlgoLogic implements AlgoLogic {
         // Cancel active orders based on trend
         for (var childOrder : activeOrders) {
             // Cancel BUY order if market trend = UPWARD
-            if (childOrder.getSide() == Side.BUY && nearTouchBidTrend == PriceTrend.UpwardTrend) {
-                logger.info("[MYALGOLOGIC] Market trend is UPWARD, cancelling BUY order: " + childOrder);
+            if (childOrder.getSide() == Side.BUY && nearTouchBidTrend == PriceTrend.UpTrend) {
+                logger.info("[MYALGOLOGIC] Market trend is UP, cancelling BUY order: " + childOrder);
                 return new CancelChildOrder(childOrder);
                 // Cancel SELL order if market trend = DOWNWARD
-            } else if (childOrder.getSide() == Side.SELL && nearTouchAskTrend == PriceTrend.DownwardTrend) {
-                logger.info("[MYALGOLOGIC] Market trend is DOWNWARD, cancelling SELL order: " + childOrder);
+            } else if (childOrder.getSide() == Side.SELL && nearTouchAskTrend == PriceTrend.DownTrend) {
+                logger.info("[MYALGOLOGIC] Market trend is DOWN, cancelling SELL order: " + childOrder);
                 return new CancelChildOrder(childOrder);
             }
         }
@@ -93,15 +92,15 @@ public class MyAlgoLogic implements AlgoLogic {
         // If less than 5 child orders, create new order based on trend
         if (state.getChildOrders().size() < 5) {
             // // Decide to buy or sell based on trends
-            if (nearTouchBidTrend == PriceTrend.DownwardTrend) {
+            if (nearTouchBidTrend == PriceTrend.DownTrend) {
                 // Create buy order if price is trending up
-                logger.info("[MYALGOLOGIC] Market currently in DOWNWARD trend. Place buy order with: " + bidQuantity + " @ " + nearBidPrice);
+                logger.info("[MYALGOLOGIC] Market currently in DOWNTREND. Place buy order with: " + bidQuantity + " @ " + nearBidPrice);
                 // Create child order
                 return new CreateChildOrder(Side.BUY, bidQuantity, nearBidPrice);
                 // Sell when the near touch ask price is in upward trend
-            } if (nearTouchAskTrend == PriceTrend.UpwardTrend) {
+            } if (nearTouchAskTrend == PriceTrend.UpTrend) {
                 // Create sell order if ask price is trending up
-                logger.info("[MYALGOLOGIC] Market currently in UPWARD trend. Placing sell order with: " + askQuantity + " @ " + nearAskPrice);
+                logger.info("[MYALGOLOGIC] Market currently in UPTREND. Placing sell order with: " + askQuantity + " @ " + nearAskPrice);
                 // // Create child order
                 return new CreateChildOrder(Side.SELL, askQuantity, nearAskPrice);
             } else {
@@ -119,7 +118,6 @@ public class MyAlgoLogic implements AlgoLogic {
     // Method maintains a list of most recent prices
     // If list exceeds maxPriceHistory, remove the oldest price and add new one
     private void updateBidPrices(List<Double> priceList, double price) {
-        if (priceList.isEmpty() || priceList.get(priceList.size() - 1) !=price) {
             if (priceList.size() == maxPriceHistory) {
                 priceList.remove(0); // Remove the oldest price (FIFO)
             }
@@ -129,10 +127,7 @@ public class MyAlgoLogic implements AlgoLogic {
             logger.info("[MYALGOLOGIC] Current BUY price list: " + nearTouchBidPricesList.toString());
         }
 
-    }
-
     private void updateAskPrices(List<Double> priceList, double price) {
-        if (priceList.isEmpty() || priceList.get(priceList.size() - 1) !=price) {
             if (priceList.size() == maxPriceHistory) {
                 priceList.remove(0); // Remove the oldest price (FIFO)
             }
@@ -141,7 +136,6 @@ public class MyAlgoLogic implements AlgoLogic {
             // Log current price in list
             logger.info("[MYALGOLOGIC] Current SELL price list: " + nearTouchAskPricesList.toString());
         }
-    }
 
     // Method for percentage trend
     private PriceTrend getPrice(List<Double> priceList) {
@@ -158,24 +152,24 @@ public class MyAlgoLogic implements AlgoLogic {
 
         // Threshold for percentage change
         // Explain fixed %
-        final double percentageThreshold = 2.0;
+        final double rateOfChangeThreshold = 0;
 
         // Get 3rd and 5th price
-        Double firstPrice = priceList.get(priceList.size() - 3); 
-        Double lastPrice = priceList.get(priceList.size() - 1); 
+        Double previousClosingPrice = priceList.get(priceList.size() - 3); // 3rd to last price in list
+        Double currentClosingPrice = priceList.get(priceList.size() - 1); // last price in list
 
         // % change calculation
-        double percentageChange = ((lastPrice - firstPrice) / firstPrice * 100);
+        double rateOfChange = ((currentClosingPrice - previousClosingPrice) / previousClosingPrice * 100);
         // Log % change at 2 decimal places
-        logger.info("[MYALGOLOGIC] Percentage change from " + firstPrice + " to " + lastPrice + " is: " + String.format("%.2f", percentageChange) + "%");
+        logger.info("[MYALGOLOGIC] Percentage change from " + previousClosingPrice + " to " + currentClosingPrice + " is: " + String.format("%.2f", rateOfChange) + "%");
 
         // Check if % change results in upward trend
-        if (percentageChange >= percentageThreshold) {
-            return PriceTrend.UpwardTrend;
+        if (rateOfChange > rateOfChangeThreshold) {
+            return PriceTrend.UpTrend;
         } // Check if % change results in downward trend
         // Negative % for downward trend
-        else if (percentageChange <= -percentageThreshold) {
-            return PriceTrend.DownwardTrend;
+        else if (rateOfChange < -rateOfChangeThreshold) {
+            return PriceTrend.DownTrend;
         } else {
             return PriceTrend.NoTrend; // No significant trend
         }
@@ -184,7 +178,7 @@ public class MyAlgoLogic implements AlgoLogic {
     // Define enum for trends UpwardTrend, DownwardTrend and NoTrend
     // enum = enumeration, represents fixed set of named constants 
     private enum PriceTrend {
-        UpwardTrend, DownwardTrend, NoTrend;
+        UpTrend, DownTrend, NoTrend;
     }
 
 }

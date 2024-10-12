@@ -30,47 +30,41 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     @Test
     public void testExampleBackTest() throws Exception {
 
-    // Create first market tick
-    send(createTick());
+        send(createTick());
+        send(createTick2());
+        
+        // No orders created as not enough data after first 2 ticks
+        assertEquals(container.getState().getChildOrders().size(), 0);
 
-    // No orders created as not enough data after first tick
-    assertEquals(container.getState().getChildOrders().size(), 0);
+        // Market changes
+        send(createTick3());
+        send(createTick4());
+        send(createTick5());
+        send(createTick6());
+        send(createTick7());
+        send(createTick8());
+        send(createTick9());
+        // send(createTick10());
 
-    //when: market data moves towards us
-    send(createTick2());
-    send(createTick3());
-    send(createTick4());
-    send(createTick5());
-    send(createTick6());
-    send(createTick7());
-    send(createTick8());
-    send(createTick9());
-    send(createTick10());
-    // send(createTick11());
-    // send(createTick12());
-    // send(createTick13());
-    // send(createTick14());
-    // send(createTick15());
- 
-    // Number of child orders created depending on market trend
-    assertEquals(container.getState().getChildOrders().size(), 5);
+        // Number of child orders created depending on market trend
+        assertEquals(container.getState().getChildOrders().size(), 4);
 
-    //then: get the state
-    var state = container.getState();
+        //then: get the state
+        var state = container.getState();
 
-    // Check filled quantity for BUY
-    long buyFilledQuantity = state.getChildOrders().stream().filter(order -> order.getSide() == Side.BUY).map(ChildOrder::getFilledQuantity).reduce(Long::sum).orElse(0l); // Handles when no buy orders exists
+        // Check filled quantity for BUY
+        long buyFilledQuantity = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.BUY).map(ChildOrder::getFilledQuantity).reduce(Long::sum).orElse(0l); // Handles when no buy orders exists
 
-    // Check filled quantity for SELL
-    long sellFilledQuantity = state.getChildOrders().stream().filter(order -> order.getSide() == Side.SELL).map(ChildOrder::getFilledQuantity).reduce(Long::sum).orElse(0l); // Handles when no sell orders exists
+        // Check filled quantity for SELL
+        long sellFilledQuantity = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.SELL).map(ChildOrder::getFilledQuantity).reduce(Long::sum).orElse(0l); // Handles when no sell orders exists
     
-    // Print out filled quantities
-    System.out.println("[MYALGOTEST] Filled quantity for BUY orders: " + buyFilledQuantity);
-    System.out.println("[MYALGOTEST] Filled quantity for SELL orders: " + sellFilledQuantity);
+        // Print out filled quantities
+        System.out.println("[MYALGOTEST] Filled quantity for BUY orders: " + buyFilledQuantity);
+        System.out.println("[MYALGOTEST] Filled quantity for SELL orders: " + sellFilledQuantity);
 
-    // Updated filled quantity
-    assertEquals(200, buyFilledQuantity);
-    assertEquals(0, sellFilledQuantity);
+        // Updated filled quantity
+        assertEquals(0, buyFilledQuantity);
+        assertEquals(0, sellFilledQuantity);
 
     
     // //Check things like filled quantity, cancelled order count etc....
