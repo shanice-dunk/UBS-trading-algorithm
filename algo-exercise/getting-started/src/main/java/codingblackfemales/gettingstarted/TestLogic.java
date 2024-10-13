@@ -348,6 +348,138 @@
 
 // }
 
+// // Average Price Logic x2
+// public class MyAlgoLogic implements AlgoLogic {
+
+//     // Logs messages during execution of the algo
+//     private static final Logger logger = LoggerFactory.getLogger(MyAlgoLogic.class);
+
+//     // History of highest bid prices and lowest ask prices to analyze trends, stored in two lists
+//     private final List<Double> nearTouchBidPricesList = new LinkedList<>();
+//     private final List<Double> nearTouchAskPricesList = new LinkedList<>();
+
+//     // List holds the last 5 values of the bid and ask prices
+//     private static final int maxPriceHistory = 5;
+
+//     @Override
+//     public Action evaluate(SimpleAlgoState state) {
+//         logger.info("[MYALGOLOGIC] In My Algo Logic....");
+
+//         var orderBookAsString = Util.orderBookToString(state);
+//         logger.info("[MYALGOLOGIC] The state of the order book is:\n" + orderBookAsString);
+
+//         // Get highest bid price from order book
+//         final BidLevel nearTouchBid = state.getBidAt(0);
+//         long bidQuantity = 100;
+//         long nearBidPrice = nearTouchBid.price;
+
+//         // Get lowest ask price from order book
+//         final AskLevel nearTouchAsk = state.getAskAt(0);
+//         long askQuantity = 100;
+//         long nearAskPrice = nearTouchAsk.price;
+
+//         // Update the near touch bid and ask prices in the lists
+//         updateBidPrices(nearTouchBidPricesList, nearBidPrice);
+//         updateAskPrices(nearTouchAskPricesList, nearAskPrice);
+
+//         // Calculate the average prices for both bid and ask prices
+//         double avgBidPrice = getAveragePrice(nearTouchBidPricesList);
+//         double avgAskPrice = getAveragePrice(nearTouchAskPricesList);
+
+//         logger.info("[MYALGOLOGIC] Average BUY price: " + avgBidPrice);
+//         logger.info("[MYALGOLOGIC] Average SELL price: " + avgAskPrice);
+
+//         // Define a threshold (for example, using 50.0 as a threshold)
+//         final double thresholdPrice = 50.0;
+
+//         // Retrieve the list of current active child orders
+//         final var activeOrders = state.getActiveChildOrders();
+
+//         // Cancel active orders based on average price
+//         for (var childOrder : activeOrders) {
+//             // Cancel BUY order if average bid price is above the threshold
+//             if (childOrder.getSide() == Side.BUY && avgBidPrice > thresholdPrice) {
+//                 logger.info("[MYALGOLOGIC] Average bid price is ABOVE threshold, cancelling BUY order: " + childOrder);
+//                 return new CancelChildOrder(childOrder);
+//             }
+//             // Cancel SELL order if average ask price is below the threshold
+//             else if (childOrder.getSide() == Side.SELL && avgAskPrice < thresholdPrice) {
+//                 logger.info("[MYALGOLOGIC] Average ask price is BELOW threshold, cancelling SELL order: " + childOrder);
+//                 return new CancelChildOrder(childOrder);
+//             }
+//         }
+
+//         // If fewer than 5 child orders, create a new order based on average prices
+//         if (state.getChildOrders().size() < 5) {
+//             if (avgBidPrice < thresholdPrice) {
+//                 // Create buy order if average bid price is below the threshold
+//                 logger.info("[MYALGOLOGIC] Average bid price is BELOW threshold. Placing BUY order with: " + bidQuantity + " @ " + nearBidPrice);
+//                 return new CreateChildOrder(Side.BUY, bidQuantity, nearBidPrice);
+//             } else if (avgAskPrice > thresholdPrice) {
+//                 // Create sell order if average ask price is above the threshold
+//                 logger.info("[MYALGOLOGIC] Average ask price is ABOVE threshold. Placing SELL order with: " + askQuantity + " @ " + nearAskPrice);
+//                 return new CreateChildOrder(Side.SELL, askQuantity, nearAskPrice);
+//             } else {
+//                 logger.info("[MYALGOLOGIC] No significant price change, no action required.");
+//                 return NoAction;
+//             }
+//         } else {
+//             // If there are already 5 child orders, no action
+//             logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders, orders complete.");
+//             return NoAction;
+//         }
+//     }
+
+//     // Method maintains a list of most recent bid prices without duplicates
+//     private void updateBidPrices(List<Double> priceList, double price) {
+//         if (priceList.size() == maxPriceHistory) {
+//             priceList.remove(0); // Remove the oldest price (FIFO)
+//         }
+//         // Check for duplicates before adding the new price
+//         if (!priceList.contains(price)) {
+//             priceList.add(price); // Only add if the price is not already in the list
+//         } else {
+//             logger.info("[MYALGOLOGIC] Duplicate BUY price found: " + price + ". Not adding to list.");
+//         }
+//         // Log the current price list
+//         logger.info("[MYALGOLOGIC] Current BUY price list: " + priceList.toString());
+//     }
+
+//     // Method maintains a list of most recent ask prices without duplicates
+//     private void updateAskPrices(List<Double> priceList, double price) {
+//         if (priceList.size() == maxPriceHistory) {
+//             priceList.remove(0); // Remove the oldest price (FIFO)
+//         }
+//         // Check for duplicates before adding the new price
+//         if (!priceList.contains(price)) {
+//             priceList.add(price); // Only add if the price is not already in the list
+//         } else {
+//             logger.info("[MYALGOLOGIC] Duplicate SELL price found: " + price + ". Not adding to list.");
+//         }
+//         // Log the current price list
+//         logger.info("[MYALGOLOGIC] Current SELL price list: " + priceList.toString());
+//     }
+
+//     // Method to calculate the average price from the price list
+//     private double getAveragePrice(List<Double> priceList) {
+//         if (priceList == null || priceList.isEmpty()) {
+//             logger.error("[MYALGOLOGIC] Price list is null or empty.");
+//             return 0.0;
+//         }
+
+//         double sum = 0.0;
+//         for (double price : priceList) {
+//             sum += price;
+//         }
+//         return sum / priceList.size(); // Return the average price
+//     }
+
+//     // Define enums for BUY and SELL actions (assuming these classes exist in your environment)
+//     private enum Side {
+//         BUY, SELL
+//     }
+
+
 
 // // Trend logic    
 // public class MyAlgoLogic<PriceTrend> implements AlgoLogic {

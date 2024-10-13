@@ -44,10 +44,10 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         send(createTick7());
         send(createTick8());
         send(createTick9());
-        // send(createTick10());
+        send(createTick10());
 
         // Number of child orders created depending on market trend
-        assertEquals(container.getState().getChildOrders().size(), 4);
+        assertEquals(container.getState().getChildOrders().size(), 5);
 
         //then: get the state
         var state = container.getState();
@@ -63,7 +63,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         System.out.println("[MYALGOTEST] Filled quantity for SELL orders: " + sellFilledQuantity);
 
         // Updated filled quantity
-        assertEquals(0, buyFilledQuantity);
+        assertEquals(200, buyFilledQuantity);
         assertEquals(0, sellFilledQuantity);
 
     

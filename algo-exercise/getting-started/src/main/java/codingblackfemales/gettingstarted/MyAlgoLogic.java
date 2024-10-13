@@ -34,7 +34,6 @@ public class MyAlgoLogic implements AlgoLogic {
     // evaluate - decision making
     // Action - create or cancel orders
     public Action evaluate(SimpleAlgoState state) {
-        // Threshold logic
         // Loggers run outputs of the current state of the order book
         logger.info("[MYALGOLOGIC] In My Algo Logic....");
 
@@ -121,7 +120,14 @@ public class MyAlgoLogic implements AlgoLogic {
             if (priceList.size() == maxPriceHistory) {
                 priceList.remove(0); // Remove the oldest price (FIFO)
             }
-            priceList.add((double) price);
+
+            // // Check for duplicates before adding the new prices
+            // if (!priceList.contains(price)) {
+                priceList.add((double) price);
+            // } else {
+            //     logger.info("[MYALGOLOGIC] Duplicate BUY price found: " + price + ". This will not be added to the list.");
+            // }
+            
     
             // Log current price in list
             logger.info("[MYALGOLOGIC] Current BUY price list: " + nearTouchBidPricesList.toString());
@@ -131,7 +137,12 @@ public class MyAlgoLogic implements AlgoLogic {
             if (priceList.size() == maxPriceHistory) {
                 priceList.remove(0); // Remove the oldest price (FIFO)
             }
-            priceList.add((double) price);
+            // Check for duplicates before adding the new prices
+            // if (!priceList.contains(price)) {
+                priceList.add((double) price);
+            // } else {
+            //     logger.info("[MYALGOLOGIC] Duplicate SELL price found: " + price + ". This will not be added to the list.");
+            // }
     
             // Log current price in list
             logger.info("[MYALGOLOGIC] Current SELL price list: " + nearTouchAskPricesList.toString());
@@ -152,7 +163,7 @@ public class MyAlgoLogic implements AlgoLogic {
 
         // Threshold for percentage change
         // Explain fixed %
-        final double rateOfChangeThreshold = 0;
+        final double rateOfChangeThreshold = 2.0;
 
         // Get 3rd and 5th price
         Double previousClosingPrice = priceList.get(priceList.size() - 3); // 3rd to last price in list
