@@ -26,7 +26,7 @@ public class MyAlgoLogic implements AlgoLogic {
     private final List<Double> nearTouchBidPricesList = new LinkedList<>();
     private final List<Double> nearTouchAskPricesList = new LinkedList<>();
     
-    // List hold the last 10 values of the bid and ask prices
+    // List hold the last 5 values of the bid and ask prices
     // Small window of price history for analysis (constant)
     private static final int maxPriceHistory = 5;
 
@@ -41,14 +41,14 @@ public class MyAlgoLogic implements AlgoLogic {
 
         logger.info("[MYALGOLOGIC] The state of the order book is:\n" + orderBookAsString);
 
-        // Get highest bid price from order book
+        // Get best bid price from order book
         // Object
         final BidLevel nearTouchBid = state.getBidAt(0);
         // Primitive values
         long bidQuantity = 100;
         long nearBidPrice = nearTouchBid.price;
 
-        // Get lowest ask price from order book
+        // Get best ask price from order book
         // Object
         final AskLevel nearTouchAsk = state.getAskAt(0);
         // Primitive values
@@ -90,17 +90,15 @@ public class MyAlgoLogic implements AlgoLogic {
 
         // If less than 5 child orders, create new order based on trend
         if (state.getChildOrders().size() < 5) {
-            // // Decide to buy or sell based on trends
+            // Decide to buy or sell based on trends
             if (nearTouchBidTrend == PriceTrend.DownTrend) {
-                // Create buy order if price is trending up
+                // Create buy order if PriceTrend = DownTrend
                 logger.info("[MYALGOLOGIC] Market currently in DOWNTREND. Place buy order with: " + bidQuantity + " @ " + nearBidPrice);
-                // Create child order
                 return new CreateChildOrder(Side.BUY, bidQuantity, nearBidPrice);
-                // Sell when the near touch ask price is in upward trend
+                // Create sell order if PriceTrend = UpTrend
             } if (nearTouchAskTrend == PriceTrend.UpTrend) {
                 // Create sell order if ask price is trending up
                 logger.info("[MYALGOLOGIC] Market currently in UPTREND. Placing sell order with: " + askQuantity + " @ " + nearAskPrice);
-                // // Create child order
                 return new CreateChildOrder(Side.SELL, askQuantity, nearAskPrice);
             } else {
                 // No action if there is no trend
@@ -115,7 +113,7 @@ public class MyAlgoLogic implements AlgoLogic {
 
     }
     // Method maintains a list of most recent prices
-    // If list exceeds maxPriceHistory, remove the oldest price and add new one
+    // If list exceeds maxPriceHistory, remove the oldest price and add new one (FIFO)
     private void updateBidPrices(List<Double> priceList, double price) {
             if (priceList.size() == maxPriceHistory) {
                 priceList.remove(0); // Remove the oldest price (FIFO)
@@ -127,7 +125,6 @@ public class MyAlgoLogic implements AlgoLogic {
             // } else {
             //     logger.info("[MYALGOLOGIC] Duplicate BUY price found: " + price + ". This will not be added to the list.");
             // }
-            
     
             // Log current price in list
             logger.info("[MYALGOLOGIC] Current BUY price list: " + nearTouchBidPricesList.toString());
@@ -149,6 +146,7 @@ public class MyAlgoLogic implements AlgoLogic {
         }
 
     // Method for percentage trend
+    // Null check 
     private PriceTrend getPrice(List<Double> priceList) {
         if (priceList == null) {
             logger.error("[MYALGOLOGIC] Price list is null.");
@@ -162,7 +160,6 @@ public class MyAlgoLogic implements AlgoLogic {
         }
 
         // Threshold for percentage change
-        // Explain fixed %
         final double rateOfChangeThreshold = 2.0;
 
         // Get 3rd and 5th price

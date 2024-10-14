@@ -44,7 +44,7 @@ public class MyAlgoTest extends AbstractAlgoTest {
         send(createTick9());
         send(createTick10());
 
-        // Number of child orders created depending on market trend
+        // Total number of child orders created
         assertEquals(container.getState().getChildOrders().size(), 5);
 
 

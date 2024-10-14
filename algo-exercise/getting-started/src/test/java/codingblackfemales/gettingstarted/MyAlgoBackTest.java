@@ -2,9 +2,12 @@ package codingblackfemales.gettingstarted;
 
 import codingblackfemales.algo.AlgoLogic;
 import codingblackfemales.sotw.ChildOrder;
+import codingblackfemales.sotw.OrderState;
 import messages.order.Side;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 /**
@@ -40,13 +43,17 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         send(createTick3());
         send(createTick4());
         send(createTick5());
+
+        // Check number of child orders after enough data
+        assertEquals(container.getState().getChildOrders().size(), 3);
+
         send(createTick6());
         send(createTick7());
         send(createTick8());
         send(createTick9());
         send(createTick10());
 
-        // Number of child orders created depending on market trend
+        // Total number of child orders created
         assertEquals(container.getState().getChildOrders().size(), 5);
 
         //then: get the state
@@ -57,14 +64,27 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
 
         // Check filled quantity for SELL
         long sellFilledQuantity = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.SELL).map(ChildOrder::getFilledQuantity).reduce(Long::sum).orElse(0l); // Handles when no sell orders exists
+
+        // Check how many buy orders cancelled
+        long cancelledBuyOrders = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.BUY).filter(childOrder -> childOrder.getState() == OrderState.CANCELLED).count();
+
+        // Check how many sell orders cancelled
+        long cancelledSellOrders = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.SELL).filter(childOrder -> childOrder.getState() == OrderState.CANCELLED).count();
+
     
         // Print out filled quantities
         System.out.println("[MYALGOTEST] Filled quantity for BUY orders: " + buyFilledQuantity);
         System.out.println("[MYALGOTEST] Filled quantity for SELL orders: " + sellFilledQuantity);
+        // Print out cancelled orders
+        System.out.println("[MYALGOTEST] Total number of CANCELLED BUY orders: " + cancelledBuyOrders);
+        System.out.println("[MYALGOTEST] Total number of CANCELLED SELL orders: " + cancelledSellOrders);
 
         // Updated filled quantity
         assertEquals(200, buyFilledQuantity);
         assertEquals(0, sellFilledQuantity);
+        // Updated cancelled orders
+        assertTrue(cancelledBuyOrders > 0);
+        assertTrue(cancelledSellOrders > 0);
 
     
     // //Check things like filled quantity, cancelled order count etc....
