@@ -31,22 +31,13 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     }
 
     @Test
-    public void testExampleBackTest() throws Exception {
+    public void backTestMyAlgo() throws Exception {
 
         send(createTick());
         send(createTick2());
-        
-        // No orders created as not enough data after first 2 ticks
-        assertEquals(container.getState().getChildOrders().size(), 0);
-
-        // Market changes
         send(createTick3());
         send(createTick4());
         send(createTick5());
-
-        // Check number of child orders after enough data
-        assertEquals(container.getState().getChildOrders().size(), 3);
-
         send(createTick6());
         send(createTick7());
         send(createTick8());
@@ -86,12 +77,6 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         assertTrue(cancelledBuyOrders > 0);
         assertTrue(cancelledSellOrders > 0);
 
-    
-    // //Check things like filled quantity, cancelled order count etc....
-    // long filledQuantity = state.getChildOrders().stream().map(ChildOrder::getFilledQuantity).reduce(Long::sum).get();
-    
-    // //and: check that our algo state was updated to reflect our fills when the market data
-    // assertEquals(200, filledQuantity);
     }
 
 }

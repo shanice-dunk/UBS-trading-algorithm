@@ -134,7 +134,7 @@ public class MyAlgoLogic implements AlgoLogic {
             if (priceList.size() == maxPriceHistory) {
                 priceList.remove(0); // Remove the oldest price (FIFO)
             }
-            // Check for duplicates before adding the new prices
+            // // Check for duplicates before adding the new prices
             // if (!priceList.contains(price)) {
                 priceList.add((double) price);
             // } else {
