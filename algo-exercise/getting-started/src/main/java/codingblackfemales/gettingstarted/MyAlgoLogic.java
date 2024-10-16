@@ -22,7 +22,8 @@ public class MyAlgoLogic implements AlgoLogic {
     // Logs messages during execution of the algo
     private static final Logger logger = LoggerFactory.getLogger(MyAlgoLogic.class);
 
-    // History of highest bid prices and lowest ask price to analyse trends which are stored in two lists (objects)
+    // Best bid and ask prices to analyse trends which are stored in two lists (objects)
+    // LinkedList used due to fast adding and deleting at the beginning and end of lists = more efficient
     private final List<Double> nearTouchBidPricesList = new LinkedList<>();
     private final List<Double> nearTouchAskPricesList = new LinkedList<>();
     
@@ -88,8 +89,8 @@ public class MyAlgoLogic implements AlgoLogic {
             }
         }
 
-        // If less than 5 child orders, create new order based on trend
-        if (state.getChildOrders().size() < 5) {
+        // If less than 3 child orders, create new order based on trend
+        if (state.getActiveChildOrders().size() < 3) {
             // Decide to buy or sell based on trends
             if (nearTouchBidTrend == PriceTrend.DownTrend) {
                 // Create buy order if PriceTrend = DownTrend
@@ -106,43 +107,66 @@ public class MyAlgoLogic implements AlgoLogic {
                 return NoAction;
             }
         } else {
-            // If there are 5 child orders, no action
             logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders, orders complete.");
             return NoAction;
         }
 
     }
+
+    // Method for removing duplicates from list
+    private void removeDuplicates(List<Double> pricList) {
+        // Set to track unique values
+        // Set only allows distinct elements
+        Set<Double> uniquePrices = new HashSet<>();
+
+        // Iterator to traverse list and remove duplicates
+        // Safely remove elements from the list while traversing it
+        // More efficient and avoids ConcurrentModificationException (modify the list directly while iterating)
+        Iterator<Double> iterator = pricList.iterator();
+
+        while (iterator.hasNext()) {
+            Double price = iterator.next();
+            // If the price is already in the set, remove from list
+            if (!uniquePrices.add(price)) {
+                iterator.remove();
+            }
+        }
+
+    }
+
     // Method maintains a list of most recent prices
     // If list exceeds maxPriceHistory, remove the oldest price and add new one (FIFO)
     private void updateBidPrices(List<Double> priceList, double price) {
             if (priceList.size() == maxPriceHistory) {
                 priceList.remove(0); // Remove the oldest price (FIFO)
             }
-
-            // // Check for duplicates before adding the new prices
-            // if (!priceList.contains(price)) {
                 priceList.add((double) price);
-            // } else {
-            //     logger.info("[MYALGOLOGIC] Duplicate BUY price found: " + price + ". This will not be added to the list.");
-            // }
+
+                // Price list BEFORE removing duplicates
+                logger.info("[MYALGOLOGIC] Current BUY price list BEFORE removing duplicates: " + nearTouchBidPricesList.toString());
+
+                // Remove duplicates after adding new price
+                removeDuplicates(priceList);
     
-            // Log current price in list
-            logger.info("[MYALGOLOGIC] Current BUY price list: " + nearTouchBidPricesList.toString());
+                // Price list AFTER removing duplicates
+                logger.info("[MYALGOLOGIC] Current BUY price list AFTER removing duplicates: " + nearTouchBidPricesList.toString());
         }
 
     private void updateAskPrices(List<Double> priceList, double price) {
             if (priceList.size() == maxPriceHistory) {
                 priceList.remove(0); // Remove the oldest price (FIFO)
             }
-            // // Check for duplicates before adding the new prices
-            // if (!priceList.contains(price)) {
+
                 priceList.add((double) price);
-            // } else {
-            //     logger.info("[MYALGOLOGIC] Duplicate SELL price found: " + price + ". This will not be added to the list.");
-            // }
+
+                // Price list BEFORE removing duplicates
+                logger.info("[MYALGOLOGIC] Current SELL price list BEFORE removing duplicates: " + nearTouchAskPricesList.toString());
+
+                // Remove duplicates after adding new price
+                removeDuplicates(priceList);
     
-            // Log current price in list
-            logger.info("[MYALGOLOGIC] Current SELL price list: " + nearTouchAskPricesList.toString());
+                // Log current price in list
+                logger.info("[MYALGOLOGIC] Current SELL price list AFTER removing duplicates: " + nearTouchAskPricesList.toString());
         }
 
     // Method for percentage trend
@@ -162,8 +186,8 @@ public class MyAlgoLogic implements AlgoLogic {
         // Threshold for percentage change
         final double rateOfChangeThreshold = 2.0;
 
-        // Get 3rd and 5th price
-        Double previousClosingPrice = priceList.get(priceList.size() - 3); // 3rd to last price in list
+        // Get 4th and 5th price
+        Double previousClosingPrice = priceList.get(priceList.size() - 2); // 3rd to last price in list
         Double currentClosingPrice = priceList.get(priceList.size() - 1); // last price in list
 
         // % change calculation
