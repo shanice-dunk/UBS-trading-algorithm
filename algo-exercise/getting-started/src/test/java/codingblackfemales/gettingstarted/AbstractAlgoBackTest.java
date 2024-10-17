@@ -309,13 +309,12 @@ public abstract class AbstractAlgoBackTest extends SequencerTestCase {
 
         encoder.askBookCount(4)
                 .next().price(105L).size(101L)
-                .next().price(107L).size(200L)
-                .next().price(113L).size(5000L)
+                .next().price(108L).size(200L)
+                .next().price(114L).size(5000L)
                 .next().price(120L).size(5600L);
 
         encoder.instrumentStatus(InstrumentStatus.CONTINUOUS);
 
         return directBuffer;
     }
-
 }

@@ -31,7 +31,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
     }
 
     @Test
-    public void backTestMyAlgo() throws Exception {
+    public void uptrendDowntrendTest() throws Exception {
 
         send(createTick());
         send(createTick2());
@@ -39,7 +39,7 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         send(createTick4());
         send(createTick5());
         send(createTick6());
-        // send(createTick7());
+        send(createTick7());
         // send(createTick8());
 
         //then: get the state
@@ -66,16 +66,17 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         System.out.println("[MYALGOTEST] Total number of CANCELLED SELL orders: " + cancelledSellOrders);
 
         // Updated filled quantity
-        // 6x ticks
-        assertEquals(101, buyFilledQuantity);
-        // // 8x ticks
-        // assertEquals(202, buyFilledQuantity);
+        // // 6x ticks
+        // assertEquals(101, buyFilledQuantity);
+        // 8x ticks
+        assertEquals(202, buyFilledQuantity);
         assertEquals(0, sellFilledQuantity);
         // // Updated cancelled orders
-        // // 8x ticks
+        // 8x ticks
         // assertTrue(cancelledBuyOrders > 0);
         assertTrue(cancelledSellOrders > 0);
 
     }
+
 
 }

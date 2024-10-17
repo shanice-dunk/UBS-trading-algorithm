@@ -39,14 +39,14 @@ public class MyAlgoTest extends AbstractAlgoTest {
         send(createTick4());
         send(createTick5());
         send(createTick6());
-        // send(createTick7());
-        // send(createTick8());
+        send(createTick7());
+        send(createTick8());
 
-        // Total number of child orders created (6x ticks)
-        assertEquals(container.getState().getChildOrders().size(), 6);
+        // // Total number of child orders created (6x ticks)
+        // assertEquals(container.getState().getChildOrders().size(), 6);
 
-        // // Total number of child orders created (8x ticks)
-        // assertEquals(container.getState().getChildOrders().size(), 9);
+        // Total number of child orders created (8x ticks)
+        assertEquals(container.getState().getChildOrders().size(), 9);
         
 
     }

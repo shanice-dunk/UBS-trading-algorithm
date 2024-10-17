@@ -187,7 +187,7 @@ public class MyAlgoLogic implements AlgoLogic {
         final double rateOfChangeThreshold = 2.0;
 
         // Get 4th and 5th price
-        Double previousClosingPrice = priceList.get(priceList.size() - 2); // 3rd to last price in list
+        Double previousClosingPrice = priceList.get(priceList.size() - 2); // 2nd to last price in list
         Double currentClosingPrice = priceList.get(priceList.size() - 1); // last price in list
 
         // % change calculation
