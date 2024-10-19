@@ -25,7 +25,7 @@ public class MyAlgoTest extends AbstractAlgoTest {
 
 
     @Test
-    public void testDispatchThroughSequencer() throws Exception {
+    public void uptrendDowntrendUnit() throws Exception {
 
         //create a sample market data tick....
         send(createTick());
@@ -40,13 +40,32 @@ public class MyAlgoTest extends AbstractAlgoTest {
         send(createTick5());
         send(createTick6());
         send(createTick7());
+
+        // Total number of child orders created
+        assertEquals(container.getState().getChildOrders().size(), 6);
+        
+
+    }
+
+    @Test
+    public void downtrendUptrendUnit() throws Exception {
+
+        //create a sample market data tick....
         send(createTick8());
+        send(createTick9());
 
-        // // Total number of child orders created (6x ticks)
-        // assertEquals(container.getState().getChildOrders().size(), 6);
+        // No orders created as not enough data after first 2 ticks
+        assertEquals(container.getState().getChildOrders().size(), 0);
 
-        // Total number of child orders created (8x ticks)
-        assertEquals(container.getState().getChildOrders().size(), 9);
+        // Market changes
+        send(createTick10());
+        send(createTick11());
+        send(createTick12());
+        send(createTick13());
+        send(createTick14());
+
+        // Total number of child orders created
+        assertEquals(container.getState().getChildOrders().size(), 6);
         
 
     }

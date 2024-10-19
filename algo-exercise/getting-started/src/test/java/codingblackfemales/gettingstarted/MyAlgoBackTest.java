@@ -40,7 +40,6 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         send(createTick5());
         send(createTick6());
         send(createTick7());
-        // send(createTick8());
 
         //then: get the state
         var state = container.getState();
@@ -66,17 +65,57 @@ public class MyAlgoBackTest extends AbstractAlgoBackTest {
         System.out.println("[MYALGOTEST] Total number of CANCELLED SELL orders: " + cancelledSellOrders);
 
         // Updated filled quantity
-        // // 6x ticks
-        // assertEquals(101, buyFilledQuantity);
-        // 8x ticks
         assertEquals(202, buyFilledQuantity);
         assertEquals(0, sellFilledQuantity);
         // // Updated cancelled orders
-        // 8x ticks
-        // assertTrue(cancelledBuyOrders > 0);
+        assertTrue(cancelledBuyOrders == 0);
         assertTrue(cancelledSellOrders > 0);
 
     }
+
+    @Test
+    public void downtrendUptrendTest() throws Exception {
+
+        send(createTick8());
+        send(createTick9());
+        send(createTick10());
+        send(createTick11());
+        send(createTick12());
+        send(createTick13());
+        send(createTick14());
+
+        //then: get the state
+        var state = container.getState();
+
+        // Check filled quantity for BUY
+        long buyFilledQuantity = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.BUY).map(ChildOrder::getFilledQuantity).reduce(Long::sum).orElse(0l); // Handles when no buy orders exists
+
+        // Check filled quantity for SELL
+        long sellFilledQuantity = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.SELL).map(ChildOrder::getFilledQuantity).reduce(Long::sum).orElse(0l); // Handles when no sell orders exists
+
+        // Check how many buy orders cancelled
+        long cancelledBuyOrders = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.BUY).filter(childOrder -> childOrder.getState() == OrderState.CANCELLED).count();
+
+        // Check how many sell orders cancelled
+        long cancelledSellOrders = state.getChildOrders().stream().filter(childOrder -> childOrder.getSide() == Side.SELL).filter(childOrder -> childOrder.getState() == OrderState.CANCELLED).count();
+
+    
+        // Print out filled quantities
+        System.out.println("[MYALGOTEST] Filled quantity for BUY orders: " + buyFilledQuantity);
+        System.out.println("[MYALGOTEST] Filled quantity for SELL orders: " + sellFilledQuantity);
+        // Print out cancelled orders
+        System.out.println("[MYALGOTEST] Total number of CANCELLED BUY orders: " + cancelledBuyOrders);
+        System.out.println("[MYALGOTEST] Total number of CANCELLED SELL orders: " + cancelledSellOrders);
+
+        // Updated filled quantity
+        assertEquals(101, buyFilledQuantity);
+        assertEquals(0, sellFilledQuantity);
+        // // Updated cancelled orders
+        assertTrue(cancelledBuyOrders > 0);
+        assertTrue(cancelledSellOrders == 0);
+
+    }
+
 
 
 }
