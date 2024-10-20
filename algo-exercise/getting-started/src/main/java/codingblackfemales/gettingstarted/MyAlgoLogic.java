@@ -15,11 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
-// TREND ALGO LOGIC WITH % (tests are working)
 public class MyAlgoLogic implements AlgoLogic {
         
-    // Logs messages during execution of the algo
     private static final Logger logger = LoggerFactory.getLogger(MyAlgoLogic.class);
 
     // Best bid and ask prices to analyse trends which are stored in two lists (objects)
@@ -68,8 +65,6 @@ public class MyAlgoLogic implements AlgoLogic {
         PriceTrend nearTouchBidTrend = getPrice(nearTouchBidPricesList);
         PriceTrend nearTouchAskTrend = getPrice(nearTouchAskPricesList);
         
-
-        // Logs the trends for the bid and ask prices
         logger.info("[MYALGOLOGIC] Near touch bid price trend is: " + nearTouchBidTrend);
         logger.info("[MYALGOLOGIC] Near touch ask price trend is: " + nearTouchAskTrend);
 
@@ -91,7 +86,6 @@ public class MyAlgoLogic implements AlgoLogic {
 
         // If less than 3 child orders, create new order based on trend
         if (state.getActiveChildOrders().size() < 3) {
-            // Decide to buy or sell based on trends
             if (nearTouchBidTrend == PriceTrend.DownTrend) {
                 // Create buy order if PriceTrend = DownTrend
                 logger.info("[MYALGOLOGIC] Market currently in DOWNTREND. Place buy order with: " + bidQuantity + " @ " + nearBidPrice);
@@ -135,7 +129,6 @@ public class MyAlgoLogic implements AlgoLogic {
     }
 
     // Method maintains a list of most recent prices
-    // If list exceeds maxPriceHistory, remove the oldest price and add new one (FIFO)
     private void updateBidPrices(List<Double> priceList, double price) {
             if (priceList.size() == maxPriceHistory) {
                 priceList.remove(0); // Remove the oldest price (FIFO)
@@ -186,9 +179,9 @@ public class MyAlgoLogic implements AlgoLogic {
         // Threshold for percentage change
         final double rateOfChangeThreshold = 2.0;
 
-        // Get 4th and 5th price
-        Double previousClosingPrice = priceList.get(priceList.size() - 2); // 2nd to last price in list
-        Double currentClosingPrice = priceList.get(priceList.size() - 1); // last price in list
+        // Get last and second to last price
+        Double previousClosingPrice = priceList.get(priceList.size() - 2);
+        Double currentClosingPrice = priceList.get(priceList.size() - 1);
 
         // % change calculation
         double rateOfChange = ((currentClosingPrice - previousClosingPrice) / previousClosingPrice * 100);
