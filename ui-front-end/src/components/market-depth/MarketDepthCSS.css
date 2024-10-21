@@ -22,7 +22,7 @@ thead {
   background-color: #f2f2f2;
 }
 
-.priceIncrease {
+/* .priceIncrease {
   color: green;
   font-weight: bold;
 }
@@ -30,7 +30,7 @@ thead {
 .priceDecrease {
   color: red;
   font-weight: bold;
-}
+} */
 
 .arrow {
   font-size: 12px;

@@ -18,6 +18,7 @@ public abstract class IntrusiveLinkedListNode<TYPEOF extends IntrusiveLinkedList
 
     protected int size = 0;
 
+    @SuppressWarnings("unchecked")
     protected IntrusiveLinkedListNode() {
         this.first = (TYPEOF) this;
         this.last = (TYPEOF) this;
