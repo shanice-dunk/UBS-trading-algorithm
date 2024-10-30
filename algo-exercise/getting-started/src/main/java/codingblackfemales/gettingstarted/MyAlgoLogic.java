@@ -27,6 +27,7 @@ public class MyAlgoLogic implements AlgoLogic {
     // List hold the last 5 values of the bid and ask prices
     // Small window of price history for analysis (constant)
     private static final int maxPriceHistory = 5;
+    
 
     @Override
     // evaluate - decision making
