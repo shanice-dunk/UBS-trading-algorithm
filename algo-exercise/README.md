@@ -125,3 +125,5 @@ finally push the tag
 git push origin final_submission
 ```
 Then share the link to your tag in the fork before the submission deadline with CBF team.
+
+for eg: https://github.com/cbfacademy/trading-algorithm-assessment/releases/tag/v1.0
