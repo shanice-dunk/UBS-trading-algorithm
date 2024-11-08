@@ -127,6 +127,11 @@ public class MyAlgoLogic implements AlgoLogic {
 }
 
     // Method to calculate profit based on the average buy and sell prices
+    // stream() method called to convert list into stream (abstraction that allows to process elements in the list in functional style)
+    // .mapToDouble - method to convert stream of Double objects into stream of primitive double values
+    // Double::doubleValue - returns the double value that Double object represents
+    // .avergae - calculates average of all double values in stream
+    // orElse(0.0) - provides default value if stream is empty
     private boolean calculateProfit() {
         double averageBuyPrice = buyPrices.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
         double averageSellPrice = sellPrices.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
