@@ -3,13 +3,16 @@
 // import { MarketDepthPanel } from "./MarketDepthPanel";
 import "../market-depth/MarketDepthCSS.css";
 
+// props
 interface PriceCellProps {
     price: number; // The current price
     previousPrice: number | null; // Previous price to compare with
 }
 
+// Functional component, price & previousPrice as props
 export const PriceCell = ({price, previousPrice} : PriceCellProps) => {
 
+    // Helper function
     const getPriceArrow = () => {
         if (previousPrice === null) return null; // No arrow for the first render
         if (price > previousPrice) return <span className="arrowUp">⬆</span>; // Price increased
@@ -25,6 +28,7 @@ export const PriceCell = ({price, previousPrice} : PriceCellProps) => {
     //     return ''; // No change
     // }
 
+    // Render table
     return (
         // <td className={getPriceChange()}>
         <td>

@@ -4,22 +4,26 @@ import "../market-depth/MarketDepthCSS.css";
 
 // import { MarketDepthRow } from "./useMarketDepthData";
 
-
+// props
 interface QuantityCellProps {
     quantity: number; // Current quantity
     previousQuantity: number | null; // Previous quantity to compare with
     type: 'bid' | 'ask'; // Differentiate between bid and ask quantity
 }
 
+// Component, takes quantity, previousQuantity & type as props
 export const QuantityCell = ({quantity, previousQuantity, type}: QuantityCellProps) => {
-    const [width, setWidth] = useState<number>(0); // Width of the colour bar
+    // State variable that controls width of bar
+    const [width, setWidth] = useState<number>(0); 
+    // State varialbe to indicate of quantity has increased/decreased/unchanged
     const [changeDirection, setDirection] = useState<'increase' | 'decrease' | null>(null);
 
+    // Hook 
     useEffect(() => {
         // Set initial width
         setWidth((quantity / 5000) * 100);
 
-        // Check if quantity has increased or decreases
+        // Check if quantity has increased or decreased or unchanged
         if (previousQuantity !== null) {
             if (quantity > previousQuantity) {
                 setDirection('increase');
@@ -31,9 +35,10 @@ export const QuantityCell = ({quantity, previousQuantity, type}: QuantityCellPro
         }
     }, [quantity, previousQuantity]);
 
-    // Class based on type
+    // Styling depending on type (bid or ask)
     const baseClass = type === 'bid' ? 'bid-quantity' : 'ask-quantity';
 
+    // Rendering table
     return (
         <td className={`${baseClass}`}>
             <div

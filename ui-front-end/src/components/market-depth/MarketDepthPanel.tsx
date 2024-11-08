@@ -3,18 +3,23 @@ import { MarketDepthRow } from "./useMarketDepthData";
 import { PriceCell } from "../price-cell/PriceCell";
 import { QuantityCell } from "../quantity-cell/QuantityCell";
 
+// Defines the structure of the expected data prop, which is an array of MarketDepthRow items
 interface MarketDepthPanelProps {
     data: MarketDepthRow[];
 }
 
+// Functional component, receives data as prop
 export const MarketDepthPanel = ({ data }: MarketDepthPanelProps) => {
+    // reference object to store the previous value of the data prop
     const previousDataRef = useRef<MarketDepthRow[] | null>(null);  // Use useRef to store previous data
 
+    // Hook that runs everytime data changes
     useEffect(() => {
         // Update the ref to store the current data
         previousDataRef.current = data;
     }, [data]);
 
+    // Renders table structure
     return (
         <div className="table-container">
         <table>

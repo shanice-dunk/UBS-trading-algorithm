@@ -108,19 +108,17 @@ public class MyAlgoLogic implements AlgoLogic {
 
     }
 
-    // Method for removing duplicates from list
+    // Method removes duplicate prices from a list by using a Set to keep unique values only
     private void removeDuplicates(List<Double> pricList) {
-        // Set to track unique values
-        // Set only allows distinct elements
+ 
         Set<Double> uniquePrices = new HashSet<>();
 
-        // Iterator to traverse list and remove duplicates
-        // Safely remove elements from the list while traversing it
-        // More efficient and avoids ConcurrentModificationException (modify the list directly while iterating)
+        // Iterator which allows traversal through each element of pricList while providing a safe way to remove elements during iteration
         Iterator<Double> iterator = pricList.iterator();
 
+        // Loop iterates over each element in priceList 
         while (iterator.hasNext()) {
-            Double price = iterator.next();
+            Double price = iterator.next(); // retrieves next element in list
             // If the price is already in the set, remove from list
             if (!uniquePrices.add(price)) {
                 iterator.remove();
