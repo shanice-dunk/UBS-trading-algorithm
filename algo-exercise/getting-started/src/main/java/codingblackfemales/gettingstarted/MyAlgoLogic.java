@@ -27,6 +27,13 @@ public class MyAlgoLogic implements AlgoLogic {
     // List hold the last 5 values of the bid and ask prices
     // Small window of price history for analysis (constant)
     private static final int maxPriceHistory = 5;
+
+    // Profit threshold
+    private static final double profitThreshold = 1.5;
+
+    // Array lists for executed buy and sell orders
+    private final List<Double> buyPrices = new ArrayList<>();
+    private final List<Double> sellPrices = new ArrayList<>();
     
 
     @Override
@@ -90,11 +97,13 @@ public class MyAlgoLogic implements AlgoLogic {
             if (nearTouchBidTrend == PriceTrend.DownTrend) {
                 // Create buy order if PriceTrend = DownTrend
                 logger.info("[MYALGOLOGIC] Market currently in DOWNTREND. Place buy order with: " + bidQuantity + " @ " + nearBidPrice);
+                buyPrices.add((double) nearBidPrice);
                 return new CreateChildOrder(Side.BUY, bidQuantity, nearBidPrice);
                 // Create sell order if PriceTrend = UpTrend
             } if (nearTouchAskTrend == PriceTrend.UpTrend) {
                 // Create sell order if ask price is trending up
                 logger.info("[MYALGOLOGIC] Market currently in UPTREND. Placing sell order with: " + askQuantity + " @ " + nearAskPrice);
+                sellPrices.add((double) nearAskPrice);
                 return new CreateChildOrder(Side.SELL, askQuantity, nearAskPrice);
             } else {
                 // No action if there is no trend
@@ -103,9 +112,29 @@ public class MyAlgoLogic implements AlgoLogic {
             }
         } else {
             logger.info("[MYALGOLOGIC] Have: " + state.getChildOrders().size() + " child orders, orders complete.");
-            return NoAction;
         }
 
+    // Call calculateProfit() to determine profit % after trade
+    if (sellPrices.size() > 0 && buyPrices.size() > 0) {
+        boolean isProfit = calculateProfit();
+        if (isProfit) {
+            logger.info("[MYALGOLOGIC] Profit threshold has been met.");
+        } else {
+            logger.info("[MYALGOLOGIC] Profit threshold has not been met.");
+        }
+    }
+    return NoAction;
+}
+
+    // Method to calculate profit based on the average buy and sell prices
+    private boolean calculateProfit() {
+        double averageBuyPrice = buyPrices.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+        double averageSellPrice = sellPrices.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+
+        double profitPercent = ((averageSellPrice - averageBuyPrice) / averageBuyPrice) * 100;
+        logger.info("[MYALGOLOGIC] Current profit percentage: " + String.format("%.2f", profitPercent) + "%");
+
+        return profitPercent >= profitThreshold;
     }
 
     // Method for removing duplicates from list
